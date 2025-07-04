@@ -37,7 +37,7 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const res = await login(role, password);
+    const res = await login('moderator', '$2b$10$abc123');
     if (res) {
       window.location.href = '/dashboard'; // или navigate(...)
     }
@@ -91,7 +91,7 @@ export default function Login() {
           sx={{ mt: 1 }}
         />
 
-        <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
+        <Button onClick={handleLogin} type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
           Войти
         </Button>
       </Box>

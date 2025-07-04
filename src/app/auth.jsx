@@ -1,8 +1,9 @@
 export async function login(role, password) {
-  const res = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+  const currentTime = new Date();
+  const res = await fetch('http://localhost:5009/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ role, password }),
+    body: JSON.stringify({ role, password, currentTime }),
   });
 
   if (!res.ok) {

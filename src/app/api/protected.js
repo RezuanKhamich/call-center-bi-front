@@ -1,6 +1,6 @@
 export async function getDashboard(role) {
   const token = localStorage.getItem('token');
-  const res = await fetch(`${process.env.REACT_APP_API_URL}/${role}/dashboard`, {
+  const res = await fetch(`${import.meta.env.REACT_APP_API_URL}/${role}/dashboard`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
