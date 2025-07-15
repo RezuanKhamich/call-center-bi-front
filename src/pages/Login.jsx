@@ -1,45 +1,35 @@
 import { useState } from 'react';
 import LogoImage from '../shared/LogoImage';
-import Logo from '../assets/logo.png';
+import Logo from '../assets/logo.svg';
 import TypographyTitle from '../shared/TypographyTitle';
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from '@mui/material';
-import roles from '../app/constants';
+import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import styled from 'styled-components';
 import TextFieldWithError from '../shared/TextFieldWithError';
 import { login } from '../app/auth';
+import { roles } from '../app/constants';
 
 export default function Login() {
-  const [role, setRole] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Пример сохранения роли
-    if (remember && role) {
-      localStorage.setItem('role', role);
-    }
-    // TODO: логика авторизации
-    console.log({ role, password, remember });
-  };
+  const [errors, setErrors] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const res = await login('moderator', '$2b$10$abc123');
-    if (res) {
-      window.location.href = '/dashboard'; // или navigate(...)
+    try {
+      const data = await login(email, password, remember);
+      setErrors(null);
+      if (data) {
+        if (data.user.role === roles.moderator.value) {
+          window.location.href = '/moderator/dashboard';
+        } else if (data.user.role === roles.minister.value) {
+          window.location.href = '/minister';
+        } else {
+          window.location.href = '/mo';
+        }
+      }
+    } catch (err) {
+      setErrors(err.message);
     }
   };
 
@@ -50,7 +40,6 @@ export default function Login() {
 
       <Box
         component="form"
-        onSubmit={handleSubmit}
         sx={{
           width: '100%',
           maxWidth: 400,
@@ -66,24 +55,13 @@ export default function Login() {
           Авторизация
         </Typography>
 
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="role-label">Роль</InputLabel>
-          <Select
-            labelId="role-label"
-            value={role}
-            label="Роль"
-            onChange={(e) => setRole(e.target.value)}
-            required
-          >
-            {roles.map((r) => (
-              <MenuItem key={r.value} value={r.value}>
-                {r.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <TextFieldWithError onChange={(e) => setEmail(e.target.value)} label="Email" />
 
-        <TextFieldWithError onChange={() => {}} error={passwordError} label="Пароль" />
+        <TextFieldWithError
+          onChange={(e) => setPassword(e.target.value)}
+          error={errors}
+          label="Пароль"
+        />
 
         <FormControlLabel
           control={<Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)} />}

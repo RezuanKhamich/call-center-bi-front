@@ -12,11 +12,20 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.2.0",
+    "@mui/lab": "^7.0.0-beta.14",
     "@mui/material": "^7.2.0",
+    "@mui/x-date-pickers": "^8.7.0",
+    "d3": "^7.9.0",
+    "d3-hexbin": "^0.2.2",
+    "dayjs": "^1.11.13",
+    "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.3",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "xlsx": "^0.18.5",
+    "zukeeper": "^1.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

@@ -1,9 +1,10 @@
-export async function login(role, password) {
+export async function login(email, password, remember) {
   const currentTime = new Date();
-  const res = await fetch('http://localhost:5009/api/login', {
+
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ role, password, currentTime }),
+    body: JSON.stringify({ email, password, remember, currentTime }),
   });
 
   if (!res.ok) {
@@ -13,5 +14,17 @@ export async function login(role, password) {
 
   const data = await res.json();
   localStorage.setItem('token', data.token);
+  localStorage.setItem(
+    'user',
+    JSON.stringify({
+      id: data.user.id,
+      email: data.user.email,
+      role: data.user.role,
+      moId: data.user.moId,
+      fullName: data.user.fullName,
+      lastLogin: data.user.lastLogin,
+      passwordCreatedAt: data.user.passwordCreatedAt,
+    })
+  );
   return data;
 }
