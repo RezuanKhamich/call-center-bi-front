@@ -25,7 +25,8 @@
     "react-router-dom": "^7.6.3",
     "styled-components": "^6.1.19",
     "xlsx": "^0.18.5",
-    "zukeeper": "^1.0.2"
+    "zukeeper": "^1.0.2",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
