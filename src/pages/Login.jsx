@@ -11,13 +11,12 @@ import { roles } from '../app/constants';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
   const [errors, setErrors] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await login(email, password, remember);
+      const data = await login(email, password, true);
       setErrors(null);
       if (data) {
         if (data.user.role === roles.moderator.value) {
@@ -63,11 +62,11 @@ export default function Login() {
           label="Пароль"
         />
 
-        <FormControlLabel
+        {/* <FormControlLabel
           control={<Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)} />}
           label="Запомнить меня"
           sx={{ mt: 1 }}
-        />
+        /> */}
 
         <Button onClick={handleLogin} type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
           Войти

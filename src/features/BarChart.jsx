@@ -19,13 +19,13 @@ export default function BarChart({ reportsList = sampleData }) {
     if (!Array.isArray(reports)) return [];
 
     const weekdays = [
-      'Воскресенье',
       'Понедельник',
       'Вторник',
       'Среда',
       'Четверг',
       'Пятница',
       'Суббота',
+      'Воскресенье',
     ];
 
     const counter = {};
@@ -99,11 +99,14 @@ export default function BarChart({ reportsList = sampleData }) {
       .selectAll('rect')
       .data((d) => ['all', 'resolved'].map((key) => ({ key, value: d[key] })))
       .join('rect')
+      .join('rect')
       .attr('x', (d) => x1(d.key))
       .attr('y', (d) => y(d.value))
       .attr('width', x1.bandwidth())
       .attr('height', (d) => height - y(d.value))
-      .attr('fill', (d) => color(d.key));
+      .attr('fill', (d) => color(d.key))
+      .attr('rx', 4)
+      .attr('ry', 4);
 
     // X Axis
     svg.append('g').attr('transform', `translate(0,${height})`).call(d3.axisBottom(x0));
@@ -117,7 +120,7 @@ export default function BarChart({ reportsList = sampleData }) {
     );
 
     // Legend
-    const legend = svg.append('g').attr('transform', `translate(${width - 120}, -30)`);
+    const legend = svg.append('g').attr('transform', `translate(${(width - 260) / 2}, 290)`);
 
     const categories = [
       { label: 'Все обращения', color: '#2196f3' },
@@ -125,9 +128,9 @@ export default function BarChart({ reportsList = sampleData }) {
     ];
 
     categories.forEach((cat, i) => {
-      const g = legend.append('g').attr('transform', `translate(0, ${i * 20})`);
+      const g = legend.append('g').attr('transform', `translate(${i * 140}, 0)`);
       g.append('rect').attr('width', 12).attr('height', 12).attr('fill', cat.color);
-      g.append('text').attr('x', 16).attr('y', 10).text(cat.label).style('font-size', '13px');
+      g.append('text').attr('x', 16).attr('y', 10).text(cat.label).style('font-size', '10px');
     });
   }, [data]);
 

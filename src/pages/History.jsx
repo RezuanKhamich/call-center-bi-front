@@ -12,6 +12,7 @@ import { removeReportByDate } from '../app/requests';
 import { Toast } from '../features/Toast';
 import TypographyText from '../shared/TypographyText';
 import { BorderBottom } from '@mui/icons-material';
+import { Box, Skeleton } from '@mui/material';
 
 const BoardContainer = styled.div`
   display: flex;
@@ -34,6 +35,7 @@ function shortenFullName(fullName) {
 export default function History() {
   const [isEditing, setIsEditing] = useState(false);
   const { addToast, toasts } = useToast();
+  const SKELETON_COUNT = 5;
 
   const reportsList = useReportsLastMonthList();
   const users = useGetUsers();
@@ -108,19 +110,25 @@ export default function History() {
       <TypographyText sx={{ textAlign: 'start' }}>
         Всего отчётов: {reportByDate.length}
       </TypographyText>
-      {reportByDate.map((report, index) => (
-        <HistoryItem
-          key={report.id}
-          index={index}
-          userName={report.userName}
-          status={report.status}
-          startDate={formatDate(report.reporting_period_start_date)}
-          endDate={formatDate(report.reporting_period_end_date)}
-          error={report.error}
-          showDeleteModal={() => setReportIdForDelete(index)}
-          onEditHandler={onEditReport}
-        />
-      ))}
+      {reportsList?.isLoading
+        ? Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <Box key={i} mb={2}>
+              <Skeleton variant="rectangular" height={80} sx={{ borderRadius: '10px' }} />
+            </Box>
+          ))
+        : reportByDate.map((report, index) => (
+            <HistoryItem
+              key={report.id}
+              index={index}
+              userName={report.userName}
+              status={report.status}
+              startDate={formatDate(report.reporting_period_start_date)}
+              endDate={formatDate(report.reporting_period_end_date)}
+              error={report.error}
+              showDeleteModal={() => setReportIdForDelete(index)}
+              onEditHandler={onEditReport}
+            />
+          ))}
       {reportIdForDelete !== null && (
         <ModalConfirm
           text={`Вы уверены, что хотите удалить отчет за период

@@ -50,10 +50,13 @@ export const useMoList = () => {
 
 export const useReportsLastMonthList = () => {
   const reportsList = biStore((state) => state.reports);
-  const setReportsList = biStore((state) => state.setReports);
+  const setReportsList = biStore.getState().setReports;
+
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchReports = async () => {
+      setIsLoading(true);
       try {
         const now = new Date();
         const oneMonthAgo = new Date();
@@ -69,13 +72,15 @@ export const useReportsLastMonthList = () => {
         setReportsList(res);
       } catch (err) {
         console.error('❌ Ошибка загрузки отчетов:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchReports();
-  }, [setReportsList]);
+  }, []);
 
-  return { reportsList };
+  return { reportsList, isLoading };
 };
 
 export const useGetUsers = () => {

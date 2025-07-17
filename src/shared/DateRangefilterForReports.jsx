@@ -5,6 +5,7 @@ import { Box, TextField } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import biStore from '../app/store/store';
+import 'dayjs/locale/ru';
 
 const DateRangefilterForReports = ({ reports, onChangeReports, ...props }) => {
   const [startDate, setStartDate] = useState(dayjs().subtract(7, 'day'));
@@ -56,7 +57,7 @@ const DateRangefilterForReports = ({ reports, onChangeReports, ...props }) => {
   }, [startDate, endDate, userInfo]);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} {...props}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru" {...props}>
       <Box display="flex" gap={2}>
         <DatePicker
           label="От"

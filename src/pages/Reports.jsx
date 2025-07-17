@@ -68,6 +68,7 @@ export default function Reports() {
   const [isPublishBtnDisabled, setIsPublishBtnDisabled] = useState(true);
 
   function generateFlattenedReportData(reports) {
+    console.log('moList', moList);
     return reports.flatMap((report) =>
       report.data.map((item) => ({
         fullName: item.fullName,
@@ -90,6 +91,7 @@ export default function Reports() {
 
   const onPublishHandler = async () => {
     try {
+      console.log('generateFlattenedReportData(reports)', reports);
       const res = await postReq('moderator/reports', {
         reports: generateFlattenedReportData(reports),
       });

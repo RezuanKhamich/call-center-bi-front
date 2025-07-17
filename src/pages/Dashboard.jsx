@@ -7,7 +7,7 @@ import PieChart from '../features/PieChart';
 import BarChart from '../features/BarChart';
 import StyledTable from '../features/AppealTable';
 import LegendItem from '../shared/LegendItem';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   appealStatusList,
   appealTypesList,
@@ -16,7 +16,7 @@ import {
   roles,
   subjectsList,
 } from '../app/constants';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import DateRangeFilter from '../shared/DateRangeFilter';
 import { HexbinChart } from '../features/HexbinChart';
 import biStore from '../app/store/store';
@@ -37,6 +37,7 @@ const FilterSelected = styled(RoundRoleSelector)`
 
 export default function Dashboard() {
   const reportsList = useReportsLastMonthList();
+
   const setReportsList = biStore((state) => state.setReports);
   const moList = biStore((state) => state.moList);
 
@@ -84,11 +85,25 @@ export default function Dashboard() {
   const [department, setDepartment] = useState(departmentList[0].value);
   const [status, setStatus] = useState(statusList[0].value);
   const [agencyType, setAgencyType] = useState(agencyTypeList[0].value);
+  const [selectedMO, setSelectedMO] = useState(null);
+  const [filteredReports, setFilteredReports] = useState([]);
 
   const isReady = moList?.length > 0 && reportsList?.reportsList?.length > 0;
 
   const onChangeStartDate = (date) => setStartDate(date);
   const onChangeEndDate = (date) => setEndDate(date);
+
+  useEffect(() => {
+    if (!reportsList?.reportsList?.length) return;
+
+    const filtered = reportsList.reportsList.filter((report) => {
+      const matchAgency = agencyType ? report.agency_type === agencyType : true;
+      const matchMO = selectedMO ? report.department === selectedMO : true;
+      return matchAgency && matchMO;
+    });
+
+    setFilteredReports(filtered);
+  }, [reportsList.reportsList, agencyType, selectedMO]);
 
   const data = useMemo(() => {
     if (!isReady) return [];
@@ -100,7 +115,7 @@ export default function Dashboard() {
       return [el.abbr, stats.resolved, stats.total, mo?.id || null, el.value];
     });
   }, [moList, reportsList]);
-  console.log('agencyType', agencyType);
+
   const onApplyFiltersHandler = async () => {
     try {
       const params = new URLSearchParams();
@@ -111,10 +126,6 @@ export default function Dashboard() {
 
       if (endDate) {
         params.append('reporting_period_end_date', dayjs(endDate).toISOString());
-      }
-
-      if (agencyType) {
-        params.append('agency_type', agencyType);
       }
 
       const res = await getReq(`moderator/reports-by-date?${params.toString()}`);
@@ -146,6 +157,26 @@ export default function Dashboard() {
             <Typography fontWeight="bold" mb={2}>
               Фильтры
             </Typography>
+            {(selectedMO || agencyType) && (
+              <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
+                {selectedMO && (
+                  <Chip
+                    label={selectedMO}
+                    onDelete={() => setSelectedMO(null)}
+                    color="primary"
+                    variant="outlined"
+                  />
+                )}
+                {agencyType && (
+                  <Chip
+                    label={agencyType}
+                    onDelete={() => setAgencyType(null)}
+                    color="primary"
+                    variant="outlined"
+                  />
+                )}
+              </Box>
+            )}
             <Stack spacing={1}>
               <DateRangeFilter
                 startDate={startDate}
@@ -179,17 +210,31 @@ export default function Dashboard() {
             alignItems="center"
             sx={{ flex: '1 1 auto' }}
           >
-            <HexbinChart data={data} onSelectHex={(e) => console.log(e)} />
+            <HexbinChart
+              data={data}
+              onSelectHex={(e) => setSelectedMO(moList?.find((mo) => mo.id === e)?.name)}
+            />
           </Box>
         </Box>
       </StyledContainer>
-      <StyledContainer title="Статистика">
-        <PieChart reportsList={reportsList.reportsList} />
-        <BarChart reportsList={reportsList.reportsList} />
-      </StyledContainer>
-      <StyledContainer title="Обращения">
-        <StyledTable reportsList={reportsList.reportsList} />
-      </StyledContainer>
+      {filteredReports.length === 0 ? (
+        <StyledContainer sx={{ justifyContent: 'center' }}>
+          <TypographyTitle sx={{ mb: 3, textAlign: 'center' }}>
+            Отчеты по текущим фильтрам отсутствуют
+          </TypographyTitle>
+        </StyledContainer>
+      ) : (
+        <>
+          <StyledContainer title={selectedMO ? `${selectedMO}` : 'Общая статистика'}>
+            <PieChart reportsList={filteredReports} />
+            <BarChart reportsList={filteredReports} />
+          </StyledContainer>
+
+          <StyledContainer title={selectedMO ? `Обращения от ${selectedMO}` : 'Все обращения'}>
+            <StyledTable reportsList={filteredReports} />
+          </StyledContainer>
+        </>
+      )}
     </BoardContainer>
   );
 }

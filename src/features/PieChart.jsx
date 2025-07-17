@@ -71,18 +71,75 @@ export default function PieChart({ reportsList = sampleData }) {
       .attr('stroke', 'white')
       .style('stroke-width', '2px');
 
+    if (data.length === 1) {
+      // Один сектор — центрируем текст
+      svg
+        .append('text')
+        .text(data[0].value)
+        .attr('x', 0)
+        .attr('y', 0)
+        .style('text-anchor', 'middle')
+        .style('dominant-baseline', 'central')
+        .style('fill', 'white')
+        .style('font-size', '16px')
+        .style('font-weight', 'bold');
+    } else {
+      // Несколько секторов — рисуем в каждом
+      svg
+        .selectAll('text')
+        .data(data_ready)
+        .enter()
+        .append('text')
+        .text((d) => d.data.value)
+        .attr('transform', (d) => `translate(${arc.centroid(d)})`)
+        .style('text-anchor', 'middle')
+        .style('dominant-baseline', 'central')
+        .style('fill', 'white')
+        .style('font-size', '14px')
+        .style('font-weight', 'bold');
+    }
+
     // Draw legend
     const legend = d3
       .select(ref.current)
       .append('g')
       .attr('transform', `translate(${width + 10}, 20)`);
 
+    // const legendItem = legend
+    //   .selectAll('g')
+    //   .data(data)
+    //   .enter()
+    //   .append('g')
+    //   .attr('transform', (_, i) => `translate(0, ${i * 25})`);
+    let offsetY = 0;
+
+    const legendLines = data.map((d) => {
+      const words = d.label.split(' ');
+      const lines = [];
+      let currentLine = '';
+
+      words.forEach((word) => {
+        if ((currentLine + ' ' + word).trim().length <= 20) {
+          currentLine += ' ' + word;
+        } else {
+          lines.push(currentLine.trim());
+          currentLine = word;
+        }
+      });
+      if (currentLine) lines.push(currentLine.trim());
+      return { ...d, lines };
+    });
+
     const legendItem = legend
       .selectAll('g')
-      .data(data)
+      .data(legendLines)
       .enter()
       .append('g')
-      .attr('transform', (_, i) => `translate(0, ${i * 25})`);
+      .attr('transform', (d, i) => {
+        const y = offsetY;
+        offsetY += d.lines.length * 20; // каждая строка — 20px
+        return `translate(0, ${y})`;
+      });
 
     legendItem
       .append('rect')
@@ -90,12 +147,64 @@ export default function PieChart({ reportsList = sampleData }) {
       .attr('height', 18)
       .attr('fill', (d) => color(d.label));
 
+    // Шаг 1: разбиваем строки заранее и сохраняем их в объект с количеством строк
+
+    // Шаг 2: аккумулируем вертикальное смещение
+
+    // Прямоугольник
+    legendItem
+      .append('rect')
+      .attr('width', 18)
+      .attr('height', 18)
+      .attr('fill', (d) => color(d.label));
+
+    // Текст с переносом
     legendItem
       .append('text')
       .attr('x', 24)
       .attr('y', 14)
-      .text((d) => d.label)
-      .style('font-size', '16px');
+      .style('font-size', '14px')
+      .each(function (d) {
+        const text = d3.select(this);
+        d.lines.forEach((line, i) => {
+          text
+            .append('tspan')
+            .attr('x', 24)
+            .attr('dy', i === 0 ? 0 : '1.2em')
+            .text(line);
+        });
+      });
+
+    // legendItem
+    //   .append('text')
+    //   .attr('x', 24)
+    //   .attr('y', 14)
+    //   .style('font-size', '14px')
+    //   .each(function (d) {
+    //     const maxLineLength = 20; // макс. длина строки
+    //     const words = d.label.split(' ');
+    //     const lines = [];
+    //     let currentLine = '';
+
+    //     words.forEach((word) => {
+    //       if ((currentLine + ' ' + word).trim().length <= maxLineLength) {
+    //         currentLine += ' ' + word;
+    //       } else {
+    //         lines.push(currentLine.trim());
+    //         currentLine = word;
+    //       }
+    //     });
+    //     if (currentLine) lines.push(currentLine.trim());
+
+    //     const text = d3.select(this);
+    //     lines.forEach((line, i) => {
+    //       text
+    //         .append('tspan')
+    //         .attr('x', 24)
+    //         .attr('dy', i === 0 ? 0 : '1.2em')
+    //         .text(line);
+    //     });
+    //   });
   }, [data]);
 
   return <svg ref={ref} style={{ width: '30%', flex: 0.5, height: 'auto' }} />;
