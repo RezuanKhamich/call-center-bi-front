@@ -19,15 +19,6 @@ const DateRangefilterForReports = ({ reports, onChangeReports, ...props }) => {
     '& .MuiBox-root': {
       padding: '0 !important',
     },
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '100px',
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#3f87f5',
-      },
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      border: 'none',
-    },
     '& .MuiSvgIcon-root': {
       color: '#555',
       fontSize: '18px',
@@ -35,6 +26,19 @@ const DateRangefilterForReports = ({ reports, onChangeReports, ...props }) => {
     '& .MuiPickersInputBase-sectionsContainer': {
       fontWeight: 500,
       fontSize: '12px',
+    },
+    '& .MuiPickersOutlinedInput-root': {
+      borderRadius: '8px',
+      height: '44px',
+    },
+    '& fieldset': {
+      borderColor: '#d0d0d0',
+    },
+    '&:hover fieldset': {
+      borderColor: '#a0a0a0',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#808080',
     },
   };
 

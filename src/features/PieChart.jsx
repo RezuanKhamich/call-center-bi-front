@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import { subjectsList } from '../app/constants';
 
-const colors = d3.schemeCategory10;
+const softColorPalette = ['#8dd66b', '#f4dd75', '#f77e7e', '#79d8df', '#c2a9fa', '#ffb997'];
 
 const sampleData = [
   { label: 'Лекарственное обеспечение', value: 65 },
@@ -59,7 +59,7 @@ export default function PieChart({ reportsList = sampleData }) {
     const color = d3
       .scaleOrdinal()
       .domain(data.map((d) => d.label))
-      .range(colors);
+      .range(softColorPalette);
 
     // Draw pie
     svg
@@ -174,37 +174,6 @@ export default function PieChart({ reportsList = sampleData }) {
             .text(line);
         });
       });
-
-    // legendItem
-    //   .append('text')
-    //   .attr('x', 24)
-    //   .attr('y', 14)
-    //   .style('font-size', '14px')
-    //   .each(function (d) {
-    //     const maxLineLength = 20; // макс. длина строки
-    //     const words = d.label.split(' ');
-    //     const lines = [];
-    //     let currentLine = '';
-
-    //     words.forEach((word) => {
-    //       if ((currentLine + ' ' + word).trim().length <= maxLineLength) {
-    //         currentLine += ' ' + word;
-    //       } else {
-    //         lines.push(currentLine.trim());
-    //         currentLine = word;
-    //       }
-    //     });
-    //     if (currentLine) lines.push(currentLine.trim());
-
-    //     const text = d3.select(this);
-    //     lines.forEach((line, i) => {
-    //       text
-    //         .append('tspan')
-    //         .attr('x', 24)
-    //         .attr('dy', i === 0 ? 0 : '1.2em')
-    //         .text(line);
-    //     });
-    //   });
   }, [data]);
 
   return <svg ref={ref} style={{ width: '30%', flex: 0.5, height: 'auto' }} />;

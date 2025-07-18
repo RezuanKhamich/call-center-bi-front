@@ -1,13 +1,14 @@
 import { Box } from '@mui/material';
 import TypographyTitle from './TypographyTitle';
+import { customColors } from '../app/theme';
 
 const StyledContainer = ({ title, children, ...props }) => {
   return (
     <Box
       sx={{
         backgroundColor: '#fff',
-        border: '1px solid #d0d7de',
-        borderRadius: '8px',
+        boxShadow: customColors.boxShadow,
+        borderRadius: '20px',
         padding: 3,
       }}
     >

@@ -2,11 +2,12 @@ import { useState } from 'react';
 import LogoImage from '../shared/LogoImage';
 import Logo from '../assets/logo.svg';
 import TypographyTitle from '../shared/TypographyTitle';
-import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import styled from 'styled-components';
 import TextFieldWithError from '../shared/TextFieldWithError';
 import { login } from '../app/auth';
 import { roles } from '../app/constants';
+import { customColors } from '../app/theme';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -45,13 +46,13 @@ export default function Login() {
           mx: 'auto',
           mt: 8,
           p: 4,
-          borderRadius: 2,
-          boxShadow: 3,
+          borderRadius: '20px',
+          boxShadow: customColors.boxShadow,
           backgroundColor: 'background.paper',
         }}
       >
-        <Typography variant="h5" fontWeight={600} gutterBottom>
-          Авторизация
+        <Typography variant="h5" fontWeight={600} gutterBottom textAlign="center">
+          Войти
         </Typography>
 
         <TextFieldWithError onChange={(e) => setEmail(e.target.value)} label="Email" />
@@ -61,12 +62,6 @@ export default function Login() {
           error={errors}
           label="Пароль"
         />
-
-        {/* <FormControlLabel
-          control={<Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)} />}
-          label="Запомнить меня"
-          sx={{ mt: 1 }}
-        /> */}
 
         <Button onClick={handleLogin} type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
           Войти
@@ -80,6 +75,7 @@ const LoginContainer = styled('div')`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 40px;
+  background-color: ${customColors.primary.backgroundLight};
+  height: 100vh;
 `;

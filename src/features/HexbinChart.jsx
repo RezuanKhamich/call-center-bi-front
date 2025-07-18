@@ -1,19 +1,20 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { hexbin } from 'd3-hexbin';
+import { customColors } from '../app/theme';
 
 const colours = [
   {
     value: [85, 100],
-    color: '#9cb806',
+    color: '#8dd66b', // мягкий светло-зелёный
   },
   {
     value: [60, 84],
-    color: '#fef764',
+    color: '#f4dd75', // светло-жёлтый, тёплый и спокойный
   },
   {
     value: [0, 59],
-    color: '#f23c06',
+    color: '#f77e7e', // мягкий кораллово-красный
   },
 ];
 
@@ -73,7 +74,7 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
     });
 
     const getColor = (resolved, total) => {
-      if (!total || total === 0) return '#35d3da'; // голубой
+      if (!total || total === 0) return '#79d8df'; // голубой
 
       const percent = (resolved / total) * 100;
 
@@ -99,10 +100,7 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('id', (d) => `hex-${d.id}`)
       .attr('d', hexbinGenerator.hexagon(0))
       .attr('fill', (d) => getColor(d.values[0], d.values[1]))
-      .attr('stroke', 'black')
-      // .transition()
-      // .duration(50)
-      // .delay((d, i) => i * 50)
+      .attr('stroke', customColors.primary.backgroundLight)
       .attr('d', (d) => hexbinGenerator.hexagon(radius)); // Анимация появления соты
 
     // Добавляем текстовые метки внутрь групп
@@ -121,9 +119,6 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('opacity', 0)
       .attr('fill', 'green') // или d.color, если динамически
       .attr('rx', 2) // скругление
-      // .transition()
-      // .duration(700)
-      // .delay((d, i) => i * 50)
       .attr('opacity', 1)
       .attr('transform', 'scale(1)');
 
@@ -135,12 +130,9 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('y', 4)
       .attr('text-anchor', 'start')
       .attr('alignment-baseline', 'middle')
-      .attr('fill', 'black')
+      .attr('fill', customColors.primary.text)
       .attr('font-size', '14px')
       .attr('font-weight', 'bold')
-      // .transition()
-      // .duration(700)
-      // .delay((d, i) => i * 50)
       .text((d) => (d?.values[0] != undefined ? `${d.values[0]}` : ''));
 
     hexGroups
@@ -148,7 +140,7 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('class', 'label-center')
       .attr('text-anchor', 'middle')
       .attr('alignment-baseline', 'middle')
-      .attr('fill', 'black')
+      .attr('fill', customColors.primary.text)
       .attr('font-size', '12px')
       .attr('font-weight', 'bold')
       .each(function (d, i) {
@@ -159,10 +151,6 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
         for (let j = 0; j < words.length; j += 2) {
           lines.push(words.slice(j, j + 2).join(' '));
         }
-
-        // Задержка после анимации соты
-        // setTimeout(
-        // () => {
         lines.forEach((line, lineIndex) => {
           textEl
             .append('tspan')
@@ -170,14 +158,7 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
             .attr('dy', lineIndex === 0 ? 0 : 14)
             .text(line)
             .style('opacity', 0)
-            // .transition()
-            // .duration(300)
-            // .delay(lineIndex * 50)
             .style('opacity', 1);
-          // });
-          // },
-          // 500 + i * 50
-          // ); // ⏱ Ждём завершения анимации соты
         });
       });
 
@@ -196,9 +177,6 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('opacity', 0)
       .attr('fill', '#1e88e5') // голубой
       .attr('rx', 2) // немного скруглён
-      // .transition()
-      // .duration(700)
-      // .delay((d, i) => i * 50)
       .attr('opacity', 1)
       .attr('transform', 'scale(1)');
 
@@ -210,12 +188,9 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('y', 4)
       .attr('text-anchor', 'start')
       .attr('alignment-baseline', 'middle')
-      .attr('fill', 'black')
+      .attr('fill', customColors.primary.text)
       .attr('font-size', '14px')
       .attr('font-weight', 'bold')
-      // .transition()
-      // .duration(700)
-      // .delay((d, i) => i * 50)
       .text((d) => (d?.values[1] != undefined ? `${d.values[1]}` : ''));
 
     // Добавляем текст в SVG (по умолчанию невидимый)
@@ -224,43 +199,42 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('class', 'hover-label')
       .attr('text-anchor', 'middle')
       .attr('alignment-baseline', 'middle')
-      .attr('fill', 'black')
+      .attr('fill', customColors.primary.text)
       .attr('font-size', '16px')
       .attr('font-weight', 'bold')
       .style('opacity', 0); // Скрываем по умолчанию
-    // 🔥 Анимация при наведении (на всю группу)
 
     hexGroups
       .style('cursor', 'pointer')
       .on('mouseover', function (event, d) {
         d3.select(this)
-          .raise() // Поднимаем всю группу наверх
-          // .transition()
-          // .duration(200)
-          .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(1.4)`);
+          .raise() // Поднимаем группу наверх
+          .transition()
+          .duration(300)
+          .attr('transform', `translate(${d.x}, ${d.y}) scale(1.4)`); // Увеличение с анимацией
 
-        // Показываем текст над всеми сотами
+        // Показываем текст с анимацией
         hoverText
-          .text(d.moName) // Устанавливаем текст из d.label
-          .attr('x', width / 2.5) // По центру графика
-          .attr('y', -140) // Над всеми сотами
-          // .transition()
-          // .duration(200)
+          .text(d.moName)
+          .attr('x', width / 2.5)
+          .attr('y', -140)
+          .transition()
+          .duration(300)
           .style('opacity', 1);
       })
-      .on('mouseout', function () {
+      .on('mouseout', function (event, d) {
         d3.select(this)
-          // .transition()
-          // .duration(200)
-          .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(1)`);
+          .transition()
+          .duration(300)
+          .attr('transform', `translate(${d.x}, ${d.y}) scale(1)`); // Плавное уменьшение
 
         // Скрываем текст
-        // hoverText.transition().duration(200).style('opacity', 0);
+        hoverText.transition().duration(300).style('opacity', 0);
       })
       .on('click', function (event, d) {
         if (typeof onSelectHex === 'function') {
           console.log('d', d);
-          onSelectHex(d.moId); // или передай весь d
+          onSelectHex(d.moId);
         }
       });
   }, [data]);

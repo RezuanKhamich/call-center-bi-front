@@ -12,13 +12,15 @@ export default function LogoImage({ src, text, sx }) {
 const Icon = styled('img')`
   width: 100px;
   height: 100px;
+  position: relative;
+  left: -14px;
 `;
 
 const LogoContainer = styled('div')`
   display: flex;
   gap: 6px;
   flex-direction: column;
-  width: fit-content;
+  width: 100%;
   font-weight: 600;
   align-items: center;
 `;

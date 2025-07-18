@@ -2,6 +2,7 @@ import { Box, Button, Typography } from '@mui/material';
 
 import styled from 'styled-components';
 import Tag from '../shared/Tag';
+import SubmitButton from '../shared/SubmitButton';
 
 const ActionContainer = styled.div`
   display: flex;
@@ -23,11 +24,11 @@ const HistoryItem = ({
 }) => {
   return (
     <Box
-      borderRadius="8px"
-      border="1px solid #d0d7de;"
-      justifyContent="space-between"
-      alignItems="center"
-      p={2}
+    // borderRadius="8px"
+    // border="1px solid #d0d7de;"
+    // justifyContent="space-between"
+    // alignItems="center"
+    // p={2}
     >
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
@@ -40,12 +41,12 @@ const HistoryItem = ({
           </Box>
         </Box>
         <ActionContainer>
-          <Button variant="contained" onClick={() => onEditHandler(id)}>
-            Изменить
-          </Button>
-          <Button variant="contained" color="error" onClick={() => showDeleteModal(true)}>
-            Удалить
-          </Button>
+          <SubmitButton label="Изменить" onClickHandler={() => onEditHandler(id)} />
+          <SubmitButton
+            label="Удалить"
+            color="error"
+            onClickHandler={() => showDeleteModal(true)}
+          />
         </ActionContainer>
       </Box>
     </Box>

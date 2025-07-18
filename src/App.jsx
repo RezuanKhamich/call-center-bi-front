@@ -10,8 +10,6 @@ import MOPage from './pages/MOPage.jsx';
 import AuthRoute from './app/AuthRoute.jsx';
 import AppLayout from './pages/AppLayout.jsx';
 import { roles } from './app/constants.jsx';
-
-import './App.css';
 import biStore from './app/store/store.js';
 
 function App() {

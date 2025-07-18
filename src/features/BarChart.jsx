@@ -88,7 +88,10 @@ export default function BarChart({ reportsList = sampleData }) {
       .nice()
       .range([height, 0]);
 
-    const color = d3.scaleOrdinal().domain(['all', 'resolved']).range(['#2196f3', '#4caf50']);
+    const color = d3.scaleOrdinal().domain(['all', 'resolved']).range([
+      '#79d8df', // синий — все обращения
+      '#8dd66b', // зелёный — решённые обращения
+    ]);
 
     svg
       .append('g')
@@ -123,8 +126,8 @@ export default function BarChart({ reportsList = sampleData }) {
     const legend = svg.append('g').attr('transform', `translate(${(width - 260) / 2}, 290)`);
 
     const categories = [
-      { label: 'Все обращения', color: '#2196f3' },
-      { label: 'Решены', color: '#4caf50' },
+      { label: 'Все обращения', color: '#79d8df' },
+      { label: 'Решены', color: '#8dd66b' },
     ];
 
     categories.forEach((cat, i) => {

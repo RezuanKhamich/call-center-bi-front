@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, Menu, MenuItem, Box } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { customColors } from '../app/theme';
 
 const RoundRoleSelector = ({
   value = 'Фильтр',
@@ -35,14 +36,14 @@ const RoundRoleSelector = ({
         sx={{
           border: '1px solid #d0d7de',
           borderRadius: '8px',
-          color: '#1f2937',
+          color: customColors.primary.text,
           backgroundColor: '#fff',
           justifyContent: 'space-between',
           textTransform: 'none',
           fontWeight: 500,
           px: 2,
           py: 1,
-          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+          // boxShadow: customColors.boxShadow,
           '&:hover': {
             backgroundColor: '#f9fafb',
           },

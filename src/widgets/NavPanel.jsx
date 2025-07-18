@@ -1,12 +1,55 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Box, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Logo from '../assets/logo.svg';
 import ModalConfirm from '../features/ModalConfim';
+import styled from 'styled-components';
+import LogoImage from '../shared/LogoImage';
+import { customColors } from '../app/theme';
+
+const ListContainer = styled(List)`
+  padding: 10px 10px !important;
+  margin-top: 28px !important;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0 !important;
+  gap: 10px;
+  font-weight: 600;
+  color: gray;
+`;
+
+const ListButton = styled(ListItemButton)`
+  flex-direction: row;
+  color: #ffffff;
+  border-radius: 20px !important;
+  font-weight: 600;
+
+  &.Mui-selected {
+    background-color: ${customColors.primary.main} !important;
+    border-radius: 20px;
+    color: ${customColors.primary.white};
+    & span {
+      color: ${customColors.primary.white};
+    }
+
+    &:hover {
+      background-color: ${customColors.primary.mainHover} !important;
+      color: inherit;
+      & span {
+        color: inherit;
+      }
+    }
+  }
+
+  &:hover {
+    border-radius: 20px;
+    background-color: ${customColors.primary.mainHover} !important;
+  }
+`;
 
 const menuItems = [
   { text: 'Дашборд', icon: <DashboardIcon />, path: '/moderator/dashboard' },
@@ -15,7 +58,7 @@ const menuItems = [
   { text: 'Выйти', icon: <LogoutIcon />, path: '/login' },
 ];
 
-const Sidebar = () => {
+const NavPanel = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
 
@@ -38,45 +81,30 @@ const Sidebar = () => {
       sx={{
         width: 240,
         height: '100vh',
-        backgroundColor: '#f5f5f5',
-        borderRight: '1px solid #ddd',
         position: 'fixed',
         top: 0,
         left: 0,
         overflowY: 'auto',
         display: 'flex',
+        backgroundColor: customColors.primary.white,
         flexDirection: 'column',
+        boxShadow: customColors.boxShadow,
       }}
     >
-      <Box sx={{ p: 2, textAlign: 'center', borderBottom: '1px solid #ccc' }}>
-        <img src={Logo} alt="Logo" style={{ width: 80, height: 80, marginBottom: 8 }} />
-        <Typography variant="h6" fontWeight="bold">
-          ЦОЗМАИТ КБР
-        </Typography>
-      </Box>
+      <LogoImage src={Logo} text="ЦОЗМАИТ КБР" sx={{ width: 80, height: 80 }} />
 
-      <List sx={{ flexGrow: 1 }}>
+      <ListContainer sx={{ flexGrow: 1 }}>
         {menuItems.map((item) => (
-          <ListItemButton
+          <ListButton
             key={item.text}
             onClick={() => handleClick(item.path)}
             selected={location.pathname === item.path}
-            sx={{
-              flexDirection: 'row',
-              '&.Mui-selected': {
-                backgroundColor: '#e3f2fd',
-                color: '#1976d2',
-              },
-              '&:hover': {
-                backgroundColor: '#e3f2fd',
-              },
-            }}
           >
             <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
-          </ListItemButton>
+          </ListButton>
         ))}
-      </List>
+      </ListContainer>
       {showLogoutModal && (
         <ModalConfirm
           text="Вы уверены, что хотите выйти?"
@@ -90,4 +118,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default NavPanel;

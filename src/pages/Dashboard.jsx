@@ -25,6 +25,8 @@ import { getReq } from '../app/api/routes';
 import Logo from '../assets/logo.svg';
 import { useNavigate } from 'react-router-dom';
 import ModalConfirm from '../features/ModalConfim';
+import LogoImage from '../shared/LogoImage';
+import SubmitButton from '../shared/SubmitButton';
 
 const BoardContainer = styled.div`
   display: flex;
@@ -166,15 +168,15 @@ export default function Dashboard({ selectedRole }) {
     <BoardContainer selectedRole={selectedRole}>
       {selectedRole !== roles.moderator.value ? (
         <PageTitleContainer>
-          <Box
+          {/* <Box
             sx={{ p: 2, textAlign: 'center', display: 'flex', alignItems: 'center', gap: '20px' }}
           >
             <img src={Logo} alt="Logo" style={{ width: 80, height: 80, marginBottom: 8 }} />
             <Typography variant="h6" fontWeight="bold">
               ЦОЗМАИТ КБР
             </Typography>
-          </Box>
-
+          </Box> */}
+          <LogoImage src={Logo} text="ЦОЗМАИТ КБР" />
           <TypographyTitle sx={{ textAlign: 'center' }}>Дашборд</TypographyTitle>
           <Button variant="outlined" size="small" onClick={() => setShowLogoutModal(true)}>
             Выйти из аккаунта
@@ -232,17 +234,7 @@ export default function Dashboard({ selectedRole }) {
               {/* <FilterSelected value={appealType} onChange={setAppealType} list={appealTypeList} /> */}
               {/* <FilterSelected value={subject} onChange={setSubject} list={subjectList} /> */}
               {/* <FilterSelected value={status} onChange={setStatus} list={statusList} /> */}
-              <Button
-                variant="contained"
-                onClick={onApplyFiltersHandler}
-                sx={{
-                  backgroundColor: '#4CAF50',
-                  width: '100%',
-                  '&:hover': { backgroundColor: '#43A047' },
-                }}
-              >
-                Применить
-              </Button>
+              <SubmitButton onClickHandler={onApplyFiltersHandler} label="Применить" />
             </Stack>
           </Box>
 

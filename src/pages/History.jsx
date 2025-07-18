@@ -113,23 +113,26 @@ export default function History({ selectedRole }) {
       </TypographyText>
       {reportsList?.isLoading
         ? Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-            <Box key={i} mb={2}>
+            <Box key={i} mb={1}>
               <Skeleton variant="rectangular" height={80} sx={{ borderRadius: '10px' }} />
             </Box>
           ))
         : reportByDate.map((report, index) => (
-            <HistoryItem
-              key={report.id}
-              index={index}
-              userName={report.userName}
-              status={report.status}
-              startDate={formatDate(report.reporting_period_start_date)}
-              endDate={formatDate(report.reporting_period_end_date)}
-              error={report.error}
-              showDeleteModal={() => setReportIdForDelete(index)}
-              onEditHandler={onEditReport}
-            />
+            <StyledContainer sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <HistoryItem
+                key={report.id}
+                index={index}
+                userName={report.userName}
+                status={report.status}
+                startDate={formatDate(report.reporting_period_start_date)}
+                endDate={formatDate(report.reporting_period_end_date)}
+                error={report.error}
+                showDeleteModal={() => setReportIdForDelete(index)}
+                onEditHandler={onEditReport}
+              />
+            </StyledContainer>
           ))}
+
       {reportIdForDelete !== null && (
         <ModalConfirm
           text={`Вы уверены, что хотите удалить отчет за период
@@ -137,7 +140,7 @@ export default function History({ selectedRole }) {
             `}
           confirmLabel="Да, удалить"
           onConfirm={onDeleteReport}
-          color="red"
+          color="#d32f2f"
           onCancel={() => setReportIdForDelete(null)}
         />
       )}

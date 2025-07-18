@@ -1,17 +1,29 @@
 import { Button } from '@mui/material';
+import styled from 'styled-components';
 
-const SubmitButton = ({ disabled = false }) => (
-  <Button
+const ButtonWrapper = styled(Button)`
+  box-shadow: none !important;
+  width: 100%;
+  color: #fff;
+  font-weight: 600;
+
+  &:disabled {
+    background-color: #cdeac4;
+    color: #f5f5f5;
+  }
+`;
+
+const SubmitButton = ({ onClickHandler, label, startIcon, disabled = false, sx, ...props }) => (
+  <ButtonWrapper
     variant="contained"
-    sx={{
-      borderRadius: '10px',
-      backgroundColor: disabled ? '#c2c2c2' : '#2196f3',
-      color: disabled ? '#666' : '#fff',
-      pointerEvents: disabled ? 'none' : 'auto',
-    }}
+    sx={sx}
+    startIcon={startIcon}
+    onClick={onClickHandler}
+    disabled={disabled}
+    {...props}
   >
-    Опубликовать
-  </Button>
+    {label}
+  </ButtonWrapper>
 );
 
 export default SubmitButton;

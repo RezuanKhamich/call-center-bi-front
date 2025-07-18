@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import { parseReportExcel } from '../app/tools';
 import { reportStatus } from '../app/constants';
+import SubmitButton from '../shared/SubmitButton';
 
 const ExcelUploadButton = ({ id, onChangeReports, isEditBtn = false }) => {
   const inputId = useId();
@@ -41,26 +42,23 @@ const ExcelUploadButton = ({ id, onChangeReports, isEditBtn = false }) => {
         onChange={handleFileUpload}
       />
       {isEditBtn ? (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={triggerFileInput}
+        <SubmitButton
+          label="Изменить"
+          sx={{ maxWidth: 160 }}
+          onClickHandler={triggerFileInput}
           startIcon={<EditIcon />}
-        >
-          Изменить
-        </Button>
+        />
       ) : (
-        <Button
-          variant="contained"
-          startIcon={<UploadIcon />}
-          onClick={triggerFileInput}
+        <SubmitButton
+          label="Загрузить"
           sx={{
+            maxWidth: 160,
             backgroundColor: '#4CAF50',
             '&:hover': { backgroundColor: '#43A047' },
           }}
-        >
-          Загрузить
-        </Button>
+          onClickHandler={triggerFileInput}
+          startIcon={<UploadIcon />}
+        />
       )}
     </>
   );

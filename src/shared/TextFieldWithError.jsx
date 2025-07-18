@@ -22,4 +22,7 @@ const TextFieldWrapper = styled(TextField)`
   & .MuiOutlinedInput-root {
     border-radius: 12px;
   }
+  & p.Mui-error {
+    font-weight: 500;
+  }
 `;

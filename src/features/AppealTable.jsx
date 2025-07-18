@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { customColors } from '../app/theme';
 
 const ScrollWrapper = styled.div`
   max-height: 600px;
@@ -16,7 +17,7 @@ const Table = styled.table`
 `;
 
 const Th = styled.th`
-  background-color: #1e88e5;
+  background-color: ${customColors.primary.main};
   color: white;
   padding: 10px;
   text-align: left;
@@ -34,15 +35,15 @@ const Td = styled.td`
 `;
 
 const Row = styled.tr`
-  background-color: ${({ resolved }) => (resolved === 'Решен' ? '#e5f5e9' : '#e3f2fd')};
+  background-color: ${({ resolved }) => (resolved === 'Решен' ? '#e1f3e3' : '#e4f9fb')};
 
   &:nth-child(even) {
-    background-color: ${({ resolved }) => (resolved === 'Решен' ? '#d7eddc' : '#dbeafc')};
+    background-color: ${({ resolved }) => (resolved === 'Решен' ? '#d5ebd8' : '#d2f2f5')};
   }
 `;
 
 const Status = styled.span`
-  color: ${({ resolved }) => (resolved === 'Решен' ? '#388e3c' : '#1976d2')};
+  color: ${({ resolved }) => (resolved === 'Решен' ? '#59b377' : '#498488ff')};
   font-weight: 600;
 `;
 
