@@ -26,7 +26,7 @@ export function useAuth() {
   return { token, loginUser, logout, error };
 }
 
-export const useMoList = () => {
+export const useMoList = (selectedRole) => {
   const moList = biStore((state) => state.moList);
   const setMoList = biStore((state) => state.setMoList);
 
@@ -35,7 +35,7 @@ export const useMoList = () => {
 
     const fetchMoList = async () => {
       try {
-        const res = await getReq('moderator/get-mo-list');
+        const res = await getReq(`${selectedRole}/get-mo-list`);
         setMoList(res);
       } catch (err) {
         console.error(err);
@@ -48,7 +48,7 @@ export const useMoList = () => {
   return { moList };
 };
 
-export const useReportsLastMonthList = () => {
+export const useReportsLastMonthList = (selectedRole) => {
   const reportsList = biStore((state) => state.reports);
   const setReportsList = biStore.getState().setReports;
 
@@ -66,7 +66,7 @@ export const useReportsLastMonthList = () => {
         const endDate = now.toISOString();
 
         const res = await getReq(
-          `moderator/reports-by-date?start-date=${startDate}&end-date=${endDate}`
+          `${selectedRole}/reports-by-date?start-date=${startDate}&end-date=${endDate}`
         );
 
         setReportsList(res);
@@ -83,13 +83,13 @@ export const useReportsLastMonthList = () => {
   return { reportsList, isLoading };
 };
 
-export const useGetUsers = () => {
+export const useGetUsers = (selectedRole) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchUsersList = async () => {
       try {
-        const res = await getReq('moderator/get-users');
+        const res = await getReq(`${selectedRole}/get-users`);
         setUsers(res);
       } catch (err) {
         console.error(err);

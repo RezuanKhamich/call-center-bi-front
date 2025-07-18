@@ -7,17 +7,14 @@ import Dashboard from './pages/Dashboard.jsx';
 import History from './pages/History.jsx';
 import Reports from './pages/Reports.jsx';
 import MOPage from './pages/MOPage.jsx';
-import MinisterPage from './pages/MinisterPage.jsx';
 import AuthRoute from './app/AuthRoute.jsx';
 import AppLayout from './pages/AppLayout.jsx';
 import { roles } from './app/constants.jsx';
-import { useMoList } from './app/hooks.jsx';
 
 import './App.css';
 import biStore from './app/store/store.js';
 
 function App() {
-  const moList = useMoList();
   const setUserInfo = biStore((state) => state.setUserInfo);
 
   useEffect(() => {
@@ -50,7 +47,7 @@ function App() {
             path="/moderator/dashboard"
             element={
               <AppLayout>
-                <Dashboard />
+                <Dashboard selectedRole={roles.moderator.value} />
               </AppLayout>
             }
           />
@@ -58,7 +55,7 @@ function App() {
             path="/moderator/reports"
             element={
               <AppLayout>
-                <Reports />
+                <Reports selectedRole={roles.moderator.value} />
               </AppLayout>
             }
           />
@@ -66,7 +63,7 @@ function App() {
             path="/moderator/history"
             element={
               <AppLayout>
-                <History />
+                <History selectedRole={roles.moderator.value} />
               </AppLayout>
             }
           />
@@ -79,7 +76,7 @@ function App() {
 
         {/* Minister */}
         <Route element={<AuthRoute allowedRoles={[roles.minister.value]} />}>
-          <Route path="/minister" element={<MinisterPage />} />
+          <Route path="/minister" element={<Dashboard selectedRole={roles.minister.value} />} />
         </Route>
       </Routes>
     </BrowserRouter>

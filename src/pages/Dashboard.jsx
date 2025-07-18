@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import TypographyTitle from '../shared/TypographyTitle';
 import RoundRoleSelector from '../shared/RoundRoleSelector';
 import StyledContainer from '../shared/StyledContainer';
-import { useReportsLastMonthList } from '../app/hooks';
+import { useMoList, useReportsLastMonthList } from '../app/hooks';
 import PieChart from '../features/PieChart';
 import BarChart from '../features/BarChart';
 import StyledTable from '../features/AppealTable';
@@ -22,11 +22,21 @@ import { HexbinChart } from '../features/HexbinChart';
 import biStore from '../app/store/store';
 import dayjs from 'dayjs';
 import { getReq } from '../app/api/routes';
+import Logo from '../assets/logo.svg';
+import { useNavigate } from 'react-router-dom';
+import ModalConfirm from '../features/ModalConfim';
 
 const BoardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  ${(props) =>
+    props.selectedRole !== roles.moderator.value &&
+    `
+      max-width: 1440px;
+      margin: auto;
+      padding: 18px;
+    `}
 `;
 
 const FilterSelected = styled(RoundRoleSelector)`
@@ -35,18 +45,25 @@ const FilterSelected = styled(RoundRoleSelector)`
   }
 `;
 
-export default function Dashboard() {
-  const reportsList = useReportsLastMonthList();
+const PageTitleContainer = styled.div`
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
+export default function Dashboard({ selectedRole }) {
+  const reportsList = useReportsLastMonthList(selectedRole);
+  const moList = useMoList(selectedRole);
   const setReportsList = biStore((state) => state.setReports);
-  const moList = biStore((state) => state.moList);
+  const navigate = useNavigate();
 
   const roleList = Object.values(roles).filter((el) =>
     el.value !== 'moderator' ? { value: el.value, label: el.label } : null
   );
   const departmentList = [
     { value: null, label: 'Все мед. организации' },
-    ...moList.map((el) => ({ value: el.id, label: el.name })),
+    ...moList.moList.map((el) => ({ value: el.id, label: el.name })),
   ];
   const agencyTypeList = [
     { value: null, label: 'Все ведомства' },
@@ -79,6 +96,7 @@ export default function Dashboard() {
   const [role, setRole] = useState(roles.minister.value);
   const [startDate, setStartDate] = useState(dayjs().subtract(1, 'month').startOf('day'));
   const [endDate, setEndDate] = useState(dayjs().endOf('day'));
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const [appealType, setAppealType] = useState(appealTypeList[0].value);
   const [subject, setSubject] = useState(subjectList[0].value);
@@ -88,10 +106,16 @@ export default function Dashboard() {
   const [selectedMO, setSelectedMO] = useState(null);
   const [filteredReports, setFilteredReports] = useState([]);
 
-  const isReady = moList?.length > 0 && reportsList?.reportsList?.length > 0;
+  const isReady = moList?.moList.length > 0 && reportsList?.reportsList?.length > 0;
 
   const onChangeStartDate = (date) => setStartDate(date);
   const onChangeEndDate = (date) => setEndDate(date);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
 
   useEffect(() => {
     if (!reportsList?.reportsList?.length) return;
@@ -110,11 +134,11 @@ export default function Dashboard() {
 
     return moListWithAbbr.map((el) => {
       const stats = getMoReportStats(reportsList.reportsList, el.value);
-      const mo = moList.find((mo) => mo.name === el.value);
+      const mo = moList.moList.find((mo) => mo.name === el.value);
 
       return [el.abbr, stats.resolved, stats.total, mo?.id || null, el.value];
     });
-  }, [moList, reportsList]);
+  }, [moList.moList, reportsList]);
 
   const onApplyFiltersHandler = async () => {
     try {
@@ -128,7 +152,7 @@ export default function Dashboard() {
         params.append('reporting_period_end_date', dayjs(endDate).toISOString());
       }
 
-      const res = await getReq(`moderator/reports-by-date?${params.toString()}`);
+      const res = await getReq(`${selectedRole}/reports-by-date?${params.toString()}`);
       const data = await res.json();
 
       console.log('Полученные отчёты:', data);
@@ -139,15 +163,34 @@ export default function Dashboard() {
   };
 
   return (
-    <BoardContainer>
-      <TypographyTitle sx={{ textAlign: 'center' }}>Дашборд</TypographyTitle>
-      <RoundRoleSelector value={role} onChange={setRole} list={roleList} />
+    <BoardContainer selectedRole={selectedRole}>
+      {selectedRole !== roles.moderator.value ? (
+        <PageTitleContainer>
+          <Box
+            sx={{ p: 2, textAlign: 'center', display: 'flex', alignItems: 'center', gap: '20px' }}
+          >
+            <img src={Logo} alt="Logo" style={{ width: 80, height: 80, marginBottom: 8 }} />
+            <Typography variant="h6" fontWeight="bold">
+              ЦОЗМАИТ КБР
+            </Typography>
+          </Box>
+
+          <TypographyTitle sx={{ textAlign: 'center' }}>Дашборд</TypographyTitle>
+          <Button variant="outlined" size="small" onClick={() => setShowLogoutModal(true)}>
+            Выйти из аккаунта
+          </Button>
+        </PageTitleContainer>
+      ) : (
+        <>
+          <TypographyTitle sx={{ textAlign: 'center' }}>Дашборд</TypographyTitle>
+          <RoundRoleSelector value={role} onChange={setRole} list={roleList} />
+        </>
+      )}
       <StyledContainer>
         <Box display="flex" justifyContent="space-between" gap={4} width="100%">
-          <Box width="400px">
+          <Box width={`${selectedRole !== roles.moderator.value ? '340px' : '400px'}`}>
             <Typography fontWeight="bold" mb={2}>
               Обращений за текущий период: {reportsList?.reportsList?.length}
-              {/* Обращений за период с {startDate} по {endDate} {reportsList?.reportsList?.length} */}
             </Typography>
             <Stack spacing={1} mb={3}>
               <LegendItem color="#1e88e5" label="Всего обращений" />
@@ -212,7 +255,7 @@ export default function Dashboard() {
           >
             <HexbinChart
               data={data}
-              onSelectHex={(e) => setSelectedMO(moList?.find((mo) => mo.id === e)?.name)}
+              onSelectHex={(e) => setSelectedMO(moList?.moList?.find((mo) => mo.id === e)?.name)}
             />
           </Box>
         </Box>
@@ -234,6 +277,15 @@ export default function Dashboard() {
             <StyledTable reportsList={filteredReports} />
           </StyledContainer>
         </>
+      )}
+      {showLogoutModal && (
+        <ModalConfirm
+          text="Вы уверены, что хотите выйти?"
+          confirmLabel="Выйти"
+          color="#d32f2f"
+          onConfirm={handleLogout}
+          onCancel={() => setShowLogoutModal(false)}
+        />
       )}
     </BoardContainer>
   );

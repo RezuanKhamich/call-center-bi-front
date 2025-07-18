@@ -8,7 +8,7 @@ import { reportStatus, reportsTitle } from '../app/constants.jsx';
 import { Button } from '@mui/material';
 import { postReq } from '../app/api/routes.js';
 import biStore from '../app/store/store.js';
-import { useToast } from '../app/hooks.jsx';
+import { useMoList, useToast } from '../app/hooks.jsx';
 import { Toast } from '../features/Toast.jsx';
 
 const BoardContainer = styled.div`
@@ -24,8 +24,8 @@ const PublishContainer = styled.div`
   margin-top: 40px;
 `;
 
-export default function Reports() {
-  const moList = biStore((state) => state.moList);
+export default function Reports({ selectedRole }) {
+  const moList = useMoList(selectedRole);
   const { addToast, toasts } = useToast();
   const [reports, setReports] = useState([
     {

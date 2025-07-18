@@ -5,7 +5,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { Link, useLocation } from 'react-router-dom';
 import Logo from '../assets/logo.svg';
 import ModalConfirm from '../features/ModalConfim';
 
@@ -22,6 +21,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -49,7 +49,7 @@ const Sidebar = () => {
       }}
     >
       <Box sx={{ p: 2, textAlign: 'center', borderBottom: '1px solid #ccc' }}>
-        <img src={Logo} alt="Logo" style={{ width: 50, height: 50, marginBottom: 8 }} />
+        <img src={Logo} alt="Logo" style={{ width: 80, height: 80, marginBottom: 8 }} />
         <Typography variant="h6" fontWeight="bold">
           ЦОЗМАИТ КБР
         </Typography>

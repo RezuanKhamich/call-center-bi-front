@@ -32,13 +32,14 @@ function shortenFullName(fullName) {
   return `${lastName} ${initials}`.trim();
 }
 
-export default function History() {
+export default function History({ selectedRole }) {
   const [isEditing, setIsEditing] = useState(false);
+
   const { addToast, toasts } = useToast();
   const SKELETON_COUNT = 5;
 
-  const reportsList = useReportsLastMonthList();
-  const users = useGetUsers();
+  const reportsList = useReportsLastMonthList(selectedRole);
+  const users = useGetUsers(selectedRole);
   const [reportByDate, setReportByDate] = useState([]);
   const rawReports = reportsList?.reportsList || [];
   const [reportIdForDelete, setReportIdForDelete] = useState(null);

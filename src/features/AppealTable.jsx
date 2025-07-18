@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+const ScrollWrapper = styled.div`
+  max-height: 600px;
+  width: 100%;
+  overflow-y: auto;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+`;
+
 const Table = styled.table`
   border-collapse: collapse;
   width: 100%;
@@ -13,6 +21,9 @@ const Th = styled.th`
   padding: 10px;
   text-align: left;
   font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 `;
 
 const Td = styled.td`
@@ -26,8 +37,7 @@ const Row = styled.tr`
   background-color: ${({ resolved }) => (resolved === 'Решен' ? '#e5f5e9' : '#e3f2fd')};
 
   &:nth-child(even) {
-    background-color: ${({ resolved }) =>
-      resolved === 'Решен' ? '#d7eddc' : '#dbeafc'}; // слегка другой оттенок
+    background-color: ${({ resolved }) => (resolved === 'Решен' ? '#d7eddc' : '#dbeafc')};
   }
 `;
 
@@ -44,29 +54,31 @@ export default function StyledTable({ reportsList = [] }) {
   }, [reportsList]);
 
   return (
-    <Table>
-      <thead>
-        <tr>
-          <Th>ФИО</Th>
-          <Th>Содержание</Th>
-          <Th>Тип</Th>
-          <Th>Тема</Th>
-          <Th>Статус</Th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, i) => (
-          <Row key={i} resolved={row.status}>
-            <Td>{row.full_name}</Td>
-            <Td>{row.route}</Td>
-            <Td>{row.appeal_type}</Td>
-            <Td>{row.subject}</Td>
-            <Td>
-              <Status resolved={row.status}>{row.status}</Status>
-            </Td>
-          </Row>
-        ))}
-      </tbody>
-    </Table>
+    <ScrollWrapper>
+      <Table>
+        <thead>
+          <tr>
+            <Th>ФИО</Th>
+            <Th>Содержание</Th>
+            <Th>Тип</Th>
+            <Th>Тема</Th>
+            <Th>Статус</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, i) => (
+            <Row key={i} resolved={row.status}>
+              <Td>{row.full_name}</Td>
+              <Td>{row.route}</Td>
+              <Td>{row.appeal_type}</Td>
+              <Td>{row.subject}</Td>
+              <Td>
+                <Status resolved={row.status}>{row.status}</Status>
+              </Td>
+            </Row>
+          ))}
+        </tbody>
+      </Table>
+    </ScrollWrapper>
   );
 }
