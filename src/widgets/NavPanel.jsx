@@ -91,7 +91,7 @@ const NavPanel = () => {
         boxShadow: customColors.boxShadow,
       }}
     >
-      <LogoImage src={Logo} text="ЦОЗМАИТ КБР" sx={{ width: 80, height: 80 }} />
+      <LogoImage src={Logo} text="ЦОЗМАИТ КБР" sx={{ svg: { width: 80, height: 80 } }} />
 
       <ListContainer sx={{ flexGrow: 1 }}>
         {menuItems.map((item) => (

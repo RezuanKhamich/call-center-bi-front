@@ -7,7 +7,7 @@ import PieChart from '../features/PieChart';
 import BarChart from '../features/BarChart';
 import StyledTable from '../features/AppealTable';
 import LegendItem from '../shared/LegendItem';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   appealStatusList,
   appealTypesList,
@@ -106,9 +106,6 @@ export default function Dashboard({ selectedRole }) {
   const [status, setStatus] = useState(statusList[0].value);
   const [agencyType, setAgencyType] = useState(agencyTypeList[0].value);
   const [selectedMO, setSelectedMO] = useState(null);
-  const [filteredReports, setFilteredReports] = useState([]);
-
-  const isReady = moList?.moList.length > 0 && reportsList?.reportsList?.length > 0;
 
   const onChangeStartDate = (date) => setStartDate(date);
   const onChangeEndDate = (date) => setEndDate(date);
@@ -119,28 +116,24 @@ export default function Dashboard({ selectedRole }) {
     navigate('/login');
   };
 
-  useEffect(() => {
-    if (!reportsList?.reportsList?.length) return;
+  const filteredReports = useMemo(() => {
+    const list = reportsList?.reportsList || [];
 
-    const filtered = reportsList.reportsList.filter((report) => {
+    return list.filter((report) => {
       const matchAgency = agencyType ? report.agency_type === agencyType : true;
       const matchMO = selectedMO ? report.department === selectedMO : true;
       return matchAgency && matchMO;
     });
-
-    setFilteredReports(filtered);
   }, [reportsList.reportsList, agencyType, selectedMO]);
 
   const data = useMemo(() => {
-    if (!isReady) return [];
-
     return moListWithAbbr.map((el) => {
-      const stats = getMoReportStats(reportsList.reportsList, el.value);
+      const stats = getMoReportStats(filteredReports, el.value);
       const mo = moList.moList.find((mo) => mo.name === el.value);
 
       return [el.abbr, stats.resolved, stats.total, mo?.id || null, el.value];
     });
-  }, [moList.moList, reportsList]);
+  }, [moList.moList, filteredReports]);
 
   const onApplyFiltersHandler = async () => {
     try {
@@ -155,10 +148,10 @@ export default function Dashboard({ selectedRole }) {
       }
 
       const res = await getReq(`${selectedRole}/reports-by-date?${params.toString()}`);
-      const data = await res.json();
 
-      console.log('Полученные отчёты:', data);
-      setReportsList(data);
+      console.log('Полученные отчёты:', res);
+
+      setReportsList(res);
     } catch (err) {
       console.error('❌ Ошибка при получении отчётов:', err);
     }
@@ -168,15 +161,7 @@ export default function Dashboard({ selectedRole }) {
     <BoardContainer selectedRole={selectedRole}>
       {selectedRole !== roles.moderator.value ? (
         <PageTitleContainer>
-          {/* <Box
-            sx={{ p: 2, textAlign: 'center', display: 'flex', alignItems: 'center', gap: '20px' }}
-          >
-            <img src={Logo} alt="Logo" style={{ width: 80, height: 80, marginBottom: 8 }} />
-            <Typography variant="h6" fontWeight="bold">
-              ЦОЗМАИТ КБР
-            </Typography>
-          </Box> */}
-          <LogoImage src={Logo} text="ЦОЗМАИТ КБР" />
+          <LogoImage src={Logo} sx={{ width: 'fit-content' }} text="ЦОЗМАИТ КБР" />
           <TypographyTitle sx={{ textAlign: 'center' }}>Дашборд</TypographyTitle>
           <Button variant="outlined" size="small" onClick={() => setShowLogoutModal(true)}>
             Выйти из аккаунта
@@ -192,7 +177,7 @@ export default function Dashboard({ selectedRole }) {
         <Box display="flex" justifyContent="space-between" gap={4} width="100%">
           <Box width={`${selectedRole !== roles.moderator.value ? '340px' : '400px'}`}>
             <Typography fontWeight="bold" mb={2}>
-              Обращений за текущий период: {reportsList?.reportsList?.length}
+              Обращений за текущий период: {filteredReports?.filter((el) => el.created_at)?.length}
             </Typography>
             <Stack spacing={1} mb={3}>
               <LegendItem color="#1e88e5" label="Всего обращений" />
@@ -252,7 +237,7 @@ export default function Dashboard({ selectedRole }) {
           </Box>
         </Box>
       </StyledContainer>
-      {filteredReports.length === 0 ? (
+      {filteredReports?.filter((el) => el.created_at)?.length === 0 ? (
         <StyledContainer sx={{ justifyContent: 'center' }}>
           <TypographyTitle sx={{ mb: 3, textAlign: 'center' }}>
             Отчеты по текущим фильтрам отсутствуют

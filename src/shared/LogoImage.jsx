@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export default function LogoImage({ src, text, sx }) {
   return (
-    <LogoContainer>
+    <LogoContainer style={sx}>
       <Icon style={sx} src={src} alt="logo" />
       {text ? <span>{text}</span> : null}
     </LogoContainer>

@@ -69,7 +69,9 @@ export default function StyledTable({ reportsList = [] }) {
         <tbody>
           {data.map((row, i) => (
             <Row key={i} resolved={row.status}>
-              <Td>{row.full_name}</Td>
+              <Td>
+                {i + 1}. {row.full_name}
+              </Td>
               <Td>{row.route}</Td>
               <Td>{row.appeal_type}</Td>
               <Td>{row.subject}</Td>

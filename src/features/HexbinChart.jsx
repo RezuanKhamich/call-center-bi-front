@@ -135,6 +135,8 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('font-weight', 'bold')
       .text((d) => (d?.values[0] != undefined ? `${d.values[0]}` : ''));
 
+    const MAX_WIDTH = 60; // px — максимально допустимая ширина строки
+
     hexGroups
       .append('text')
       .attr('class', 'label-center')
@@ -145,21 +147,30 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .attr('font-weight', 'bold')
       .each(function (d, i) {
         const textEl = d3.select(this);
-        const words = d?.label?.split(' ') || [];
-        const lines = [];
+        const label = d?.label || '';
+        const words = label.split(' ');
+        const firstWord = words[0];
+        const restWords = words.slice(1).join(' ');
 
-        for (let j = 0; j < words.length; j += 2) {
-          lines.push(words.slice(j, j + 2).join(' '));
-        }
-        lines.forEach((line, lineIndex) => {
+        // Временно вставляем весь текст, чтобы измерить ширину
+        textEl.text(label);
+        const width = this.getComputedTextLength();
+
+        textEl.text(''); // очищаем
+
+        if (width <= MAX_WIDTH || words.length === 1) {
+          // Всё в одну строку
+          textEl.append('tspan').attr('x', 0).attr('dy', 0).text(label);
+        } else {
+          // Перенос: первое слово на первой строке, остальное на второй
+          textEl.append('tspan').attr('x', 0).attr('dy', 0).text(firstWord);
+
           textEl
             .append('tspan')
             .attr('x', 0)
-            .attr('dy', lineIndex === 0 ? 0 : 14)
-            .text(line)
-            .style('opacity', 0)
-            .style('opacity', 1);
-        });
+            .attr('dy', 14) // смещение вниз
+            .text(restWords);
+        }
       });
 
     const labelBottomGroup = hexGroups
@@ -233,7 +244,6 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       })
       .on('click', function (event, d) {
         if (typeof onSelectHex === 'function') {
-          console.log('d', d);
           onSelectHex(d.moId);
         }
       });
