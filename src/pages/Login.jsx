@@ -38,19 +38,7 @@ export default function Login() {
       <LogoImage src={Logo} text="ЦОЗМАИТ КБР" />
       <TypographyTitle>Мониторинг обращений граждан по КБР</TypographyTitle>
 
-      <Box
-        component="form"
-        sx={{
-          width: '100%',
-          maxWidth: 400,
-          mx: 'auto',
-          mt: 8,
-          p: 4,
-          borderRadius: '20px',
-          boxShadow: customColors.boxShadow,
-          backgroundColor: 'background.paper',
-        }}
-      >
+      <BoxWrapper component="form">
         <Typography variant="h5" fontWeight={600} gutterBottom textAlign="center">
           Войти
         </Typography>
@@ -66,7 +54,7 @@ export default function Login() {
         <Button onClick={handleLogin} type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
           Войти
         </Button>
-      </Box>
+      </BoxWrapper>
     </LoginContainer>
   );
 }
@@ -78,4 +66,14 @@ const LoginContainer = styled('div')`
   gap: 40px;
   background-color: ${customColors.primary.backgroundLight};
   height: 100vh;
+`;
+
+const BoxWrapper = styled(Box)`
+  width: 100%;
+  max-width: 400px;
+  margin: 64px auto 0;
+  margin-top: 8px;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: ${customColors.boxShadow};
 `;

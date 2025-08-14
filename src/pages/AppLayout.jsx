@@ -12,7 +12,7 @@ const AppLayout = ({ children }) => {
       }}
     >
       <NavPanel />
-      <Box component="main" sx={{ ml: '240px', p: 3, width: '100%' }}>
+      <Box component="main" sx={{ ml: '240px', p: 3, width: '100%', height: '100vh' }}>
         {children}
       </Box>
     </Box>
