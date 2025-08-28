@@ -42,10 +42,10 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
     const hexHeight = 2 * radius * 0.75;
 
     // const cols = Math.ceil(Math.sqrt(sanitizedData.length) + 1);
-    const cols = 8;
+    const cols = 7;
 
-    const width = 1140;
-    const height = 800;
+    const width = 1000;
+    const height = 910;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
