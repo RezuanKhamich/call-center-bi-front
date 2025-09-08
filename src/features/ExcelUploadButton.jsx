@@ -29,7 +29,11 @@ const ExcelUploadButton = ({ id, onChangeReports, isEditBtn = false }) => {
   };
 
   const triggerFileInput = () => {
-    document.getElementById(inputId).click();
+    const input = document.getElementById(inputId);
+    if (input) {
+      input.value = ''; // сбрасываем, чтобы можно было загрузить тот же файл
+      input.click();
+    }
   };
 
   return (
