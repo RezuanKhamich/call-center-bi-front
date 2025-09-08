@@ -2,21 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { hexbin } from 'd3-hexbin';
 import { customColors } from '../app/theme';
-
-const colours = [
-  {
-    value: [85, 100],
-    color: '#8dd66b', // мягкий светло-зелёный
-  },
-  {
-    value: [60, 84],
-    color: '#f4dd75', // светло-жёлтый, тёплый и спокойный
-  },
-  {
-    value: [0, 59],
-    color: '#f77e7e', // мягкий кораллово-красный
-  },
-];
+import { hexbinChartColours } from '../app/constants';
 
 export const HexbinChart = ({ data = [], onSelectHex }) => {
   const svgRef = useRef();
@@ -78,7 +64,7 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
 
       const percent = (resolved / total) * 100;
 
-      const matchingColour = colours.find(
+      const matchingColour = hexbinChartColours.find(
         (range) => percent >= range.value[0] && percent <= range.value[1]
       );
 

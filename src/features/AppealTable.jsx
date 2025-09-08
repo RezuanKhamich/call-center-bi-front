@@ -60,7 +60,8 @@ export default function StyledTable({ reportsList = [] }) {
         <thead>
           <tr>
             <Th>ФИО</Th>
-            <Th>Содержание</Th>
+            <Th>Суть обращения</Th>
+            <Th>Маршрут</Th>
             <Th>Тип</Th>
             <Th>Тема</Th>
             <Th>Статус</Th>
@@ -72,6 +73,7 @@ export default function StyledTable({ reportsList = [] }) {
               <Td>
                 {i + 1}. {row.full_name}
               </Td>
+              <Td>{row.description}</Td>
               <Td>{row.route}</Td>
               <Td>{row.appeal_type}</Td>
               <Td>{row.subject}</Td>

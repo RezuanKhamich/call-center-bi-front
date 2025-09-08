@@ -153,6 +153,21 @@ export const moListWithAbbr = [
   { abbr: 'Без упоминания МО', value: 'Без упоминания МО' },
 ];
 
+export const hexbinChartColours = [
+  {
+    value: [85, 100],
+    color: '#8dd66b', // мягкий светло-зелёный
+  },
+  {
+    value: [60, 84],
+    color: '#f4dd75', // светло-жёлтый, тёплый и спокойный
+  },
+  {
+    value: [0, 59],
+    color: '#f77e7e', // мягкий кораллово-красный
+  },
+];
+
 export default {
   roles,
   reportsTitle,
@@ -162,4 +177,5 @@ export default {
   appealTypesList,
   subjectsList,
   moListWithAbbr,
+  hexbinChartColours,
 };

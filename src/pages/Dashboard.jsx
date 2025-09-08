@@ -15,6 +15,7 @@ import {
   moListWithAbbr,
   roles,
   subjectsList,
+  hexbinChartColours,
 } from '../app/constants';
 import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import DateRangeFilter from '../shared/DateRangeFilter';
@@ -203,7 +204,7 @@ export default function Dashboard({ selectedRole }) {
             <Typography fontWeight="bold" mb={2}>
               Фильтры
             </Typography>
-
+            
             {(selectedMO || agencyType) && (
               <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
                 {selectedMO && (
@@ -225,7 +226,7 @@ export default function Dashboard({ selectedRole }) {
               </Box>
             )}
 
-            <Stack spacing={1}>
+            <Stack spacing={1} sx={{ marginBottom: '24px' }}>
               <DateRangeFilter
                 startDate={startDate}
                 endDate={endDate}
@@ -244,6 +245,30 @@ export default function Dashboard({ selectedRole }) {
 
               <SubmitButton onClickHandler={onApplyFiltersHandler} label="Применить" />
             </Stack>
+
+            <Typography fontWeight="bold" mb={2}>
+              Эффективность обработки обращений
+            </Typography>
+
+            <Box display="flex" flexDirection="column" gap={1}>
+              {[...hexbinChartColours, { value : "Без обращений", color: '#79d8df' }].map((item, idx) => (
+                <Box key={idx} display="flex" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: '2px',
+                      backgroundColor: item.color,
+                      border: '1px solid #ccc',
+                    }}
+                  />
+                  <Typography fontSize="14px" color="text.secondary">
+                    {typeof item.value === 'string' ? item.value : `${item.value[0]} - ${item.value[1]}%`}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+
           </Box>
 
           {/* Map */}
