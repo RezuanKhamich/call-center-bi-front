@@ -65,7 +65,7 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       const percent = (resolved / total) * 100;
 
       const matchingColour = hexbinChartColours.find(
-        (range) => percent >= range.value[0] && percent <= range.value[1]
+        (range) => percent?.toFixed(0) >= range.value[0] && percent <= range.value[1]
       );
 
       return matchingColour?.color || '#ccc';
