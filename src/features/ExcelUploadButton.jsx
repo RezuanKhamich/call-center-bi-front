@@ -36,7 +36,7 @@ const ExcelUploadButton = ({ id, onChangeReports, isEditBtn = false }) => {
     <>
       <input
         type="file"
-        accept=".xlsm"
+        accept=".xls,.xlsx,.xlsm"
         id={inputId}
         style={{ display: 'none' }}
         onChange={handleFileUpload}

@@ -12,10 +12,10 @@ export const parseReportExcel = async (file) => {
   const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
 
   jsonData.forEach((row, index) => {
-    const rowIndex = index + 2; // учёт заголовка
+    const rowIndex = index;
 
     const department = row['Наименование МО']?.trim();
-    const appealDate = row['Дата обращения'];
+    const appealDate = row['Дата обращения']?.trim();
     const route = row['Маршрут']?.trim();
     const status = row['Статус']?.trim();
     const description = row['Суть обращения']?.trim();
@@ -27,7 +27,7 @@ export const parseReportExcel = async (file) => {
     if (!department)
       errors.push({ row: rowIndex, field: 'Наименование МО', message: 'Поле обязательно' });
 
-    const parsedDate = dayjs(appealDate, ['MM/DD/YY', 'M/D/YY'], true); // строгое сравнение
+    const parsedDate = dayjs(appealDate, ['MM/DD/YY', 'M/D/YY', 'DD.MM.YYYY', 'D.M.YYYY'], true); // строгое сравнение
     if (!parsedDate.isValid()) {
       errors.push({ row: rowIndex, field: 'Дата обращения', message: 'Неверный формат даты' });
     }
