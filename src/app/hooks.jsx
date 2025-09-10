@@ -54,33 +54,33 @@ export const useReportsLastMonthList = (selectedRole) => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchReports = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const now = new Date();
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(now.getMonth() - 1);
+
+      const startDate = oneMonthAgo.toISOString();
+      const endDate = now.toISOString();
+
+      const res = await getReq(
+        `${selectedRole}/reports-by-date?reporting_period_start_date=${startDate}&reporting_period_end_date=${endDate}`
+      );
+
+      setReportsList(res);
+    } catch (err) {
+      console.error('❌ Ошибка загрузки отчетов:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedRole, setReportsList]);
+
   useEffect(() => {
-    const fetchReports = async () => {
-      setIsLoading(true);
-      try {
-        const now = new Date();
-        const oneMonthAgo = new Date();
-        oneMonthAgo.setMonth(now.getMonth() - 1);
-
-        const startDate = oneMonthAgo.toISOString();
-        const endDate = now.toISOString();
-
-        const res = await getReq(
-          `${selectedRole}/reports-by-date?start-date=${startDate}&end-date=${endDate}`
-        );
-
-        setReportsList(res);
-      } catch (err) {
-        console.error('❌ Ошибка загрузки отчетов:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchReports();
-  }, []);
+  }, [fetchReports]);
 
-  return { reportsList, isLoading };
+  return { reportsList, isLoading, refetch: fetchReports };
 };
 
 export const useGetUsers = (selectedRole) => {

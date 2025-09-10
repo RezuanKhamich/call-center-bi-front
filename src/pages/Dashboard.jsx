@@ -28,6 +28,9 @@ import { useNavigate } from 'react-router-dom';
 import ModalConfirm from '../features/ModalConfim';
 import LogoImage from '../shared/LogoImage';
 import SubmitButton from '../shared/SubmitButton';
+import { postReq } from '../app/api/routes';
+import { useToast } from '../app/hooks';
+import { Toast } from '../features/Toast';
 
 function getMoReportStats(reports, moName) {
   const filtered = reports.filter((r) => r.department === moName);
@@ -37,7 +40,7 @@ function getMoReportStats(reports, moName) {
 }
 
 export default function Dashboard({ selectedRole }) {
-  const reportsListData = useReportsLastMonthList(selectedRole);
+  const { reportsList, refetch } = useReportsLastMonthList(selectedRole);
   const moListData = useMoList(selectedRole);
 
   const setReportsList = biStore((state) => state.setReports);
@@ -96,6 +99,8 @@ export default function Dashboard({ selectedRole }) {
   const [startDate, setStartDate] = useState(dayjs().subtract(1, 'month').startOf('day'));
   const [endDate, setEndDate] = useState(dayjs().endOf('day'));
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [updatedReports, setUpdatedReports] = useState([]);
+  const { addToast, toasts } = useToast();
 
   const [appealType, setAppealType] = useState(appealTypeList[0].value);
   const [subject, setSubject] = useState(subjectList[0].value);
@@ -118,7 +123,7 @@ export default function Dashboard({ selectedRole }) {
   }, [navigate]);
 
   // Данные из стора/хуков
-  const listRaw = reportsListData?.reportsList || [];
+  const listRaw = reportsList || [];
   const mos = moListData?.moList || [];
 
   // 1) Базовая фильтрация (без selectedMO) — источник правды для HexbinChart
@@ -132,9 +137,17 @@ export default function Dashboard({ selectedRole }) {
 
   // 2) Отображаемая фильтрация (с selectedMO) — используется для карточек/графиков/таблицы
   const viewFilteredReports = useMemo(() => {
-    if (!selectedMO) return baseFilteredReports;
-    return baseFilteredReports.filter((r) => r.department === selectedMO);
-  }, [baseFilteredReports, selectedMO]);
+    // сначала склеиваем базу с изменениями
+    const mergedReports = baseFilteredReports.map(report => {
+      const updated = updatedReports.find(u => u.id === report.id);
+      return updated ? { ...report, status: updated.status } : report;
+    });
+
+    // потом фильтруем
+    if (!selectedMO) return mergedReports;
+    return mergedReports.filter(r => r.department === selectedMO);
+  }, [baseFilteredReports, selectedMO, updatedReports]);
+
 
   // Данные для HexbinChart расчитываем от baseFilteredReports (чтобы выбор МО не влиял на карту)
   const hexbinData = useMemo(() => {
@@ -152,6 +165,23 @@ export default function Dashboard({ selectedRole }) {
     },
     [mos]
   );
+
+  const saveChangedReports = async () => {
+    try {
+      const res = await postReq('moderator/reports/update-statuses', {
+        updates: updatedReports,
+      });
+
+      if (res?.message) {
+        refetch();
+        setUpdatedReports([]);
+        addToast(res.message, 'success');
+      }
+    } catch (err) {
+      console.error('❌ Ошибка при сохранении статусов:', err);
+      addToast(err?.message || 'Ошибка при сохранении статусов', 'error');
+    }
+  };
 
   const onApplyFiltersHandler = useCallback(async () => {
     try {
@@ -300,11 +330,32 @@ export default function Dashboard({ selectedRole }) {
             <BarChart reportsList={viewFilteredReports} />
           </StyledContainer>
 
-          <StyledContainer title={selectedMO ? `Обращения от ${selectedMO}` : 'Все обращения'}>
-            <StyledTable reportsList={viewFilteredReports} />
+          <StyledContainer sx={{ flexDirection: 'row' }} title={selectedMO ? `Обращения от ${selectedMO}` : 'Все обращения'}>
+            {
+              updatedReports.length > 0 && selectedRole === roles.moderator.value ? (
+                <SaveReportWrapper>
+                  <SubmitButton
+                    label="Сохранить"
+                    sx={{
+                      maxWidth: 160,
+                      backgroundColor: '#4CAF50',
+                      '&:hover': { backgroundColor: '#43A047' },
+                    }}
+                    onClickHandler={saveChangedReports}
+                  />
+                </SaveReportWrapper>
+              ) : null
+            }
+            <StyledTable
+              reportsList={viewFilteredReports}
+              role={selectedRole}
+              updatedReports={updatedReports}
+              setUpdatedReports={setUpdatedReports}
+            />
           </StyledContainer>
         </>
       )}
+      <Toast toasts={toasts} />
 
       {showLogoutModal && (
         <ModalConfirm
@@ -318,6 +369,12 @@ export default function Dashboard({ selectedRole }) {
     </BoardContainer>
   );
 }
+
+const SaveReportWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+`;
 
 const BoardContainer = styled.div`
   display: flex;
