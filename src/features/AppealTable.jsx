@@ -38,6 +38,7 @@ export default function StyledTable({ reportsList = [], role, updatedReports, se
         <thead>
           <tr>
             <Th>ФИО</Th>
+            <Th>Дата</Th>
             <Th>Суть обращения</Th>
             <Th>Маршрут</Th>
             <Th>Тип</Th>
@@ -53,6 +54,7 @@ export default function StyledTable({ reportsList = [], role, updatedReports, se
                 <Td>
                   {i + 1}. {row.full_name}
                 </Td>
+                <Td>{new Date(row.appeal_date).toLocaleDateString('ru-RU')}</Td>
                 <Td>{row.description}</Td>
                 <Td>{row.route}</Td>
                 <Td>{row.appeal_type}</Td>
