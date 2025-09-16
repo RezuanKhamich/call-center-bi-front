@@ -219,10 +219,45 @@ export const HexbinChart = ({ data = [], onSelectHex, attachedMoId }) => {
           .duration(300)
           .attr('transform', `translate(${d.x}, ${d.y}) scale(1.4)`); // Увеличение с анимацией
 
-        // Показываем текст с анимацией
+        // Очистим hoverText перед вставкой
+        hoverText.selectAll('*').remove();
+
+        const text = d.moName || '';
+        const maxChars = 80;
+
+        if (text.length > maxChars) {
+          const words = text.split(' ');
+          let firstLine = '';
+          let secondLine = '';
+
+          for (let word of words) {
+            if ((firstLine + ' ' + word).trim().length <= maxChars) {
+              firstLine = (firstLine + ' ' + word).trim();
+            } else {
+              secondLine = (secondLine + ' ' + word).trim();
+            }
+          }
+          // Показываем текст с анимацией
+          hoverText
+            .append('tspan')
+            .attr('x', width / 2.5)
+            .attr('dy', 0) // первая строка
+            .text(firstLine);
+
+          hoverText
+            .append('tspan')
+            .attr('x', width / 2.5)
+            .attr('dy', 20) // смещение вниз
+            .text(secondLine);
+        } else {
+          hoverText
+            .append('tspan')
+            .attr('x', width / 2.5)
+            .attr('dy', 0)
+            .text(text);
+        }
+
         hoverText
-          .text(d.moName)
-          .attr('x', width / 2.5)
           .attr('y', -140)
           .transition()
           .duration(300)
