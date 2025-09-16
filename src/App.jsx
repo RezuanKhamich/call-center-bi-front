@@ -69,7 +69,7 @@ function App() {
 
         {/* MO */}
         <Route element={<AuthRoute allowedRoles={[roles.mo.value]} />}>
-          <Route path="/mo" element={<MOPage />} />
+          <Route path="/mo" element={<Dashboard selectedRole={roles.mo.value} />} />
         </Route>
 
         {/* Minister */}

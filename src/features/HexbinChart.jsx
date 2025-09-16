@@ -4,7 +4,7 @@ import { hexbin } from 'd3-hexbin';
 import { customColors } from '../app/theme';
 import { hexbinChartColours } from '../app/constants';
 
-export const HexbinChart = ({ data = [], onSelectHex }) => {
+export const HexbinChart = ({ data = [], onSelectHex, attachedMoId }) => {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -84,10 +84,19 @@ export const HexbinChart = ({ data = [], onSelectHex }) => {
       .append('path')
       .attr('class', 'hexagon')
       .attr('id', (d) => `hex-${d.id}`)
-      .attr('d', hexbinGenerator.hexagon(0))
+      .attr('d', (d) => hexbinGenerator.hexagon(radius))
       .attr('fill', (d) => getColor(d.values[0], d.values[1]))
-      .attr('stroke', customColors.primary.backgroundLight)
-      .attr('d', (d) => hexbinGenerator.hexagon(radius)); // Анимация появления соты
+      .attr('stroke', (d) =>
+        d.moId === attachedMoId ? 'gold' : customColors.primary.backgroundLight
+      )
+      .attr('stroke-width', (d) => (d.moId === attachedMoId ? 4 : 1));
+
+    // поднять выбранный золотой hex выше остальных
+    if (attachedMoId) {
+      g.selectAll('.hex-group')
+        .filter((d) => d.moId === attachedMoId)
+        .raise();
+    }
 
     // Добавляем текстовые метки внутрь групп
     const labelTopGroup = hexGroups

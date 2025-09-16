@@ -50,11 +50,14 @@ export const useMoList = (selectedRole) => {
 
 export const useReportsLastMonthList = (selectedRole) => {
   const reportsList = biStore((state) => state.reports);
+  const userInfo = biStore((state) => state.userInfo);
+
   const setReportsList = biStore.getState().setReports;
 
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchReports = useCallback(async () => {
+    if (!userInfo) return;
     setIsLoading(true);
     try {
       const now = new Date();
@@ -65,7 +68,7 @@ export const useReportsLastMonthList = (selectedRole) => {
       const endDate = now.toISOString();
 
       const res = await getReq(
-        `${selectedRole}/reports-by-date?reporting_period_start_date=${startDate}&reporting_period_end_date=${endDate}`
+        `${selectedRole}/reports-by-date?reporting_period_start_date=${startDate}&reporting_period_end_date=${endDate}&mo_id=${userInfo?.moId}`
       );
 
       setReportsList(res);
@@ -74,7 +77,7 @@ export const useReportsLastMonthList = (selectedRole) => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedRole, setReportsList]);
+  }, [selectedRole, setReportsList, userInfo?.moId]);
 
   useEffect(() => {
     fetchReports();

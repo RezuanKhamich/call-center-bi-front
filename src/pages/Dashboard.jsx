@@ -7,7 +7,7 @@ import PieChart from '../features/PieChart';
 import BarChart from '../features/BarChart';
 import StyledTable from '../features/AppealTable';
 import LegendItem from '../shared/LegendItem';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   appealStatusList,
   appealTypesList,
@@ -40,6 +40,8 @@ function getMoReportStats(reports, moName) {
 }
 
 export default function Dashboard({ selectedRole }) {
+  const userInfo = biStore((state) => state.userInfo);
+  const attachedMoId = userInfo?.moId;
   const { reportsList, refetch } = useReportsLastMonthList(selectedRole);
   const moListData = useMoList(selectedRole);
 
@@ -148,7 +150,6 @@ export default function Dashboard({ selectedRole }) {
     return mergedReports.filter(r => r.department === selectedMO);
   }, [baseFilteredReports, selectedMO, updatedReports]);
 
-
   // Данные для HexbinChart расчитываем от baseFilteredReports (чтобы выбор МО не влиял на карту)
   const hexbinData = useMemo(() => {
     return moListWithAbbr.map((el) => {
@@ -188,6 +189,7 @@ export default function Dashboard({ selectedRole }) {
       const params = new URLSearchParams();
       if (startDate) params.append('reporting_period_start_date', dayjs(startDate).toISOString());
       if (endDate) params.append('reporting_period_end_date', dayjs(endDate).toISOString());
+      if (attachedMoId) params.append('mo_id', attachedMoId);
 
       const res = await getReq(`${selectedRole}/reports-by-date?${params.toString()}`);
       setReportsList(res);
@@ -200,6 +202,11 @@ export default function Dashboard({ selectedRole }) {
     () => viewFilteredReports.filter((el) => el.created_at).length,
     [viewFilteredReports]
   );
+
+  // Выбор мед орг для роли МО
+  useEffect(() => {
+    if (attachedMoId && mos?.length) handleSelectHex(attachedMoId);
+  }, [attachedMoId, mos]);
 
   return (
     <BoardContainer selectedRole={selectedRole}>
@@ -237,7 +244,7 @@ export default function Dashboard({ selectedRole }) {
             
             {(selectedMO || agencyType) && (
               <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
-                {selectedMO && (
+                {selectedMO && selectedRole !== roles.mo.value && (
                   <Chip
                     label={selectedMO}
                     onDelete={() => setSelectedMO(null)}
@@ -311,7 +318,8 @@ export default function Dashboard({ selectedRole }) {
           >
             <HexbinChart
               data={hexbinData} // ← данные не зависят от selectedMO
-              onSelectHex={handleSelectHex} // ← меняем только отображение ниже
+              onSelectHex={attachedMoId ? null : handleSelectHex} // ← меняем только отображение ниже
+              attachedMoId={attachedMoId}
             />
           </Box>
         </Box>
@@ -330,7 +338,7 @@ export default function Dashboard({ selectedRole }) {
             <BarChart reportsList={viewFilteredReports} />
           </StyledContainer>
 
-          <StyledContainer sx={{ flexDirection: 'row' }} title={selectedMO ? `Обращения от ${selectedMO}` : 'Все обращения'}>
+          <StyledContainer sx={{ flexDirection: 'row' }} title={selectedMO ? `Обращения в ${selectedMO}` : 'Все обращения'}>
             {
               updatedReports.length > 0 && selectedRole === roles.moderator.value ? (
                 <SaveReportWrapper>
