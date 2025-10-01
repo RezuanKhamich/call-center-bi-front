@@ -4,7 +4,7 @@ export async function login(email, password, remember) {
   const res = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, remember, currentTime }),
+    body: JSON.stringify({ email: email?.trim(), password: password?.trim(), remember, currentTime }),
   });
 
   if (!res.ok) {
@@ -27,4 +27,20 @@ export async function login(email, password, remember) {
     })
   );
   return data;
+}
+
+export async function resetPassword(email) {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || 'Ошибка при сбросе пароля');
+  }
+
+  const data = await res.json();
+  return data; // { message: 'Ссылка для сброса пароля отправлена на почту' }
 }

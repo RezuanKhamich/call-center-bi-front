@@ -8,11 +8,13 @@ import TextFieldWithError from '../shared/TextFieldWithError';
 import { login } from '../app/auth';
 import { roles } from '../app/constants';
 import { customColors } from '../app/theme';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,6 +52,14 @@ export default function Login() {
           error={errors}
           label="Пароль"
         />
+        {/* <Button
+          variant="text"
+          fullWidth
+          sx={{ mt: 1 }}
+          onClick={() => navigate('/forgot-password')}
+        >
+          Забыли пароль?
+        </Button> */}
 
         <Button onClick={handleLogin} type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
           Войти

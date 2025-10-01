@@ -11,6 +11,7 @@ import AuthRoute from './app/AuthRoute.jsx';
 import AppLayout from './pages/AppLayout.jsx';
 import { roles } from './app/constants.jsx';
 import biStore from './app/store/store.js';
+import ForgotPassword from './pages/ForgotPassword.jsx';
 
 function App() {
   const setUserInfo = biStore((state) => state.setUserInfo);
@@ -34,6 +35,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/404" element={<NotFound />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="*" element={<NotFound />} />
 
         {/* Главная — редирект по роли */}

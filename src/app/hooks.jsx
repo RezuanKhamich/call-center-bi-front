@@ -105,6 +105,29 @@ export const useGetUsers = (selectedRole) => {
   return { users };
 };
 
+export const useGetReportHistory = (selectedRole) => {
+  const [reportHistory, setReportHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUsersList = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getReq(`${selectedRole}/reports/unique-periods`);
+        setReportHistory(res);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsersList();
+  }, []);
+
+  return { reportHistory, isLoading };
+};
+
 export function useToast() {
   const [toasts, setToasts] = useState([]);
 
