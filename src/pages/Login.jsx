@@ -8,13 +8,11 @@ import TextFieldWithError from '../shared/TextFieldWithError';
 import { login } from '../app/auth';
 import { roles } from '../app/constants';
 import { customColors } from '../app/theme';
-import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState('');
-  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,6 +22,8 @@ export default function Login() {
       if (data) {
         if (data.user.role === roles.moderator.value) {
           window.location.href = '/moderator/dashboard';
+        } else if (data.user.role === roles['agency-moderator'].value) {
+          window.location.href = '/agency-moderator/dashboard';
         } else if (data.user.role === roles.minister.value) {
           window.location.href = '/minister';
         } else {

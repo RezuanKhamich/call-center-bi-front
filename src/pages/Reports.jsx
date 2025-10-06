@@ -80,7 +80,7 @@ export default function Reports({ selectedRole }) {
         status: item.status,
         reportingPeriodStartDate: report.reportingPeriodStartDate,
         reportingPeriodEndDate: report.reportingPeriodEndDate,
-        agencyType: report.title,
+        agencyType: report.title.value,
         createdBy: report.userId,
         updatedBy: report.userId,
       }))
@@ -119,7 +119,7 @@ export default function Reports({ selectedRole }) {
           <ReportItem
             key={report.id}
             id={report.id}
-            title={`${report.id + 1}. ${report.title}`}
+            title={`${report.id + 1}. ${report.title.label}`}
             status={report.status}
             error={report.error}
             onChangeReports={onChangeReports}

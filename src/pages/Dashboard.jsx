@@ -32,6 +32,7 @@ function getMoReportStats(reports, moName) {
 
 export default function Dashboard({ selectedRole }) {
   const userInfo = biStore((state) => state.userInfo);
+  const userRole = userInfo?.role;
   const attachedMoId = userInfo?.moId;
   const { reportsList, refetch } = useReportsLastMonthList(selectedRole);
   const moListData = useMoList(selectedRole);
@@ -49,20 +50,15 @@ export default function Dashboard({ selectedRole }) {
   );
 
   const agencyTypeList = useMemo(
-    () => [
-      { value: null, label: 'Все ведомства' },
-      ...Object.values(reportsTitle).map((el) => ({ value: el, label: el })),
-    ],
+    () => [{ value: null, label: 'Все ведомства' }, ...Object.values(reportsTitle)],
     []
   );
-
   const [startDate, setStartDate] = useState(dayjs().subtract(1, 'month').startOf('day'));
   const [endDate, setEndDate] = useState(dayjs().endOf('day'));
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [updatedReports, setUpdatedReports] = useState([]);
   const { addToast, toasts } = useToast();
-  const [agencyType, setAgencyType] = useState(agencyTypeList[0].value);
-
+  const [agencyType, setAgencyType] = useState({});
   const [selectedMO, setSelectedMO] = useState(null);
 
   const onChangeStartDate = useCallback((date) => setStartDate(date), []);
@@ -79,10 +75,10 @@ export default function Dashboard({ selectedRole }) {
 
   const baseFilteredReports = useMemo(() => {
     return listRaw.filter((report) => {
-      const matchAgency = agencyType ? report.agency_type === agencyType : true;
+      const matchAgency = agencyType?.value ? report.agency_type === agencyType.value : true;
       return matchAgency;
     });
-  }, [listRaw, agencyType]);
+  }, [listRaw, agencyType?.value]);
 
   const viewFilteredReports = useMemo(() => {
     const mergedReports = baseFilteredReports.map((report) => {
@@ -119,7 +115,7 @@ export default function Dashboard({ selectedRole }) {
 
   const saveChangedReports = async () => {
     try {
-      const res = await postReq('moderator/reports/update-reports', {
+      const res = await postReq(`${userRole}/reports/update-reports`, {
         updates: updatedReports,
       });
 
@@ -146,7 +142,7 @@ export default function Dashboard({ selectedRole }) {
     } catch (err) {
       console.error('❌ Ошибка при получении отчётов:', err);
     }
-  }, [endDate, selectedRole, setReportsList, startDate, attachedMoId]);
+  }, [endDate, userRole, setReportsList, startDate, attachedMoId]);
 
   const totalInPeriod = useMemo(
     () => viewFilteredReports.filter((el) => el.created_at).length,
@@ -154,12 +150,21 @@ export default function Dashboard({ selectedRole }) {
   );
 
   useEffect(() => {
+    const newAgency =
+      selectedRole === roles['agency-moderator'].value
+        ? agencyTypeList.find((el) => el.value === userInfo?.agencyType)
+        : agencyTypeList[0];
+
+    setAgencyType(newAgency);
+  }, [selectedRole, userInfo]);
+
+  useEffect(() => {
     if (attachedMoId && mos?.length) handleSelectHex(attachedMoId);
   }, [attachedMoId, mos, handleSelectHex]);
 
   return (
-    <BoardContainer selectedRole={selectedRole}>
-      {selectedRole !== roles.moderator.value ? (
+    <BoardContainer role={userRole}>
+      {userRole !== roles.moderator.value || userRole !== roles['agency-moderator'].value ? (
         <PageTitleContainer>
           <LogoImage src={Logo} sx={{ width: 'fit-content' }} text="ЦОЗМАИТ КБР" />
           <TypographyTitleStyled>Дашборд</TypographyTitleStyled>
@@ -175,7 +180,13 @@ export default function Dashboard({ selectedRole }) {
 
       <StyledContainer>
         <MainLayout>
-          <Sidebar width={selectedRole !== roles.moderator.value ? '340px' : '400px'}>
+          <Sidebar
+            width={
+              userRole !== roles.moderator.value || userRole !== roles['agency-moderator'].value
+                ? '340px'
+                : '400px'
+            }
+          >
             <InfoTitle>Обращений за текущий период: {totalInPeriod}</InfoTitle>
 
             <LegendWrapper>
@@ -195,10 +206,10 @@ export default function Dashboard({ selectedRole }) {
                     variant="outlined"
                   />
                 )}
-                {agencyType && (
+                {agencyType.value && selectedRole !== roles['agency-moderator'].value && (
                   <Chip
-                    label={agencyType}
-                    onDelete={() => setAgencyType(null)}
+                    label={agencyType?.label}
+                    onDelete={() => setAgencyType(agencyTypeList[0])}
                     color="primary"
                     variant="outlined"
                   />
@@ -213,8 +224,13 @@ export default function Dashboard({ selectedRole }) {
                 onChangeStartDate={onChangeStartDate}
                 onChangeEndDate={onChangeEndDate}
               />
-
-              <FilterSelected value={agencyType} onChange={setAgencyType} list={agencyTypeList} />
+              {selectedRole !== roles['agency-moderator'].value && (
+                <FilterSelected
+                  value={agencyType?.label}
+                  onChange={setAgencyType}
+                  list={agencyTypeList}
+                />
+              )}
 
               <SubmitButton onClickHandler={onApplyFiltersHandler} label="Применить" />
             </FilterStack>
@@ -266,7 +282,7 @@ export default function Dashboard({ selectedRole }) {
             <StyledTable
               reportsList={viewFilteredReports}
               saveChangedReports={saveChangedReports}
-              role={selectedRole}
+              role={userRole}
               departmentList={departmentList}
               updatedReports={updatedReports}
               setUpdatedReports={setUpdatedReports}
@@ -294,7 +310,7 @@ const BoardContainer = styled.div`
   flex-direction: column;
   gap: 20px;
   ${(props) =>
-    props.selectedRole !== roles.moderator.value &&
+    (props.role !== roles.moderator.value || props.role !== roles['agency-moderator'].value) &&
     `
       max-width: 1440px;
       margin: auto;

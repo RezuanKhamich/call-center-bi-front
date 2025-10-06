@@ -113,7 +113,7 @@ export default function StyledTable({
             onClickHandler={downloadExcel}
             startIcon={<DownloadIcon />}
           />
-          {role === roles.moderator.value ? (
+          {role === roles.moderator.value || role === roles['agency-moderator'].value ? (
             <SubmitButton
               label="Сохранить"
               disabled={updatedReports.length === 0}
@@ -159,7 +159,7 @@ export default function StyledTable({
                   <Td>{row.description}</Td>
                   <Td>{row.route}</Td>
                   <Td>
-                    {role === roles.moderator.value ? (
+                    {role === roles.moderator.value || role === roles['agency-moderator'].value ? (
                       <StyledSelect
                         value={row.department}
                         onChange={(e) => onDepartmentChange(e.target.value, row)}
@@ -178,7 +178,7 @@ export default function StyledTable({
                   <Td>{row.appeal_type}</Td>
                   <Td>{row.subject}</Td>
                   <Td>
-                    {role === roles.moderator.value ? (
+                    {role === roles.moderator.value || role === roles['agency-moderator'].value ? (
                       <StyledSelect
                         value={row.status}
                         onChange={(e) => onStatusChange(e.target.value, row)}

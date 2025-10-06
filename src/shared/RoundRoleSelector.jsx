@@ -57,7 +57,7 @@ const RoundRoleSelector = ({
           />
         }
       >
-        {list.find((item) => item.value === value)?.label || value}
+        {list.find((item) => item.label === value)?.label || value}
       </Button>
 
       <Menu
@@ -74,7 +74,7 @@ const RoundRoleSelector = ({
         }}
       >
         {list?.map((item) => (
-          <MenuItem key={item.value} onClick={() => handleSelect(item.value)}>
+          <MenuItem key={item.value} onClick={() => handleSelect(item)}>
             {item.label}
           </MenuItem>
         ))}

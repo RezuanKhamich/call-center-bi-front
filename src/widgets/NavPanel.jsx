@@ -10,6 +10,8 @@ import ModalConfirm from '../features/ModalConfim';
 import styled from 'styled-components';
 import LogoImage from '../shared/LogoImage';
 import { customColors } from '../app/theme';
+import biStore from '../app/store/store';
+import { roles } from '../app/constants';
 
 const ListContainer = styled(List)`
   padding: 10px 10px !important;
@@ -51,16 +53,32 @@ const ListButton = styled(ListItemButton)`
   }
 `;
 
-const menuItems = [
-  { text: 'Дашборд', icon: <DashboardIcon />, path: '/moderator/dashboard' },
-  { text: 'Отчёты', icon: <AssignmentIcon />, path: '/moderator/reports' },
-  { text: 'История', icon: <HistoryIcon />, path: '/moderator/history' },
-  { text: 'Выйти', icon: <LogoutIcon />, path: '/login' },
-];
-
 const NavPanel = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const userInfo = biStore((state) => state.userInfo);
+
   const navigate = useNavigate();
+
+  const menuItems = [
+    {
+      text: 'Дашборд',
+      icon: <DashboardIcon />,
+      path: `/${userInfo?.role}/dashboard`,
+    },
+    {
+      text: 'Отчёты',
+      icon: <AssignmentIcon />,
+      path: `/${userInfo?.role}/reports`,
+      disabled: userInfo?.role !== roles.moderator.value,
+    },
+    {
+      text: 'История',
+      icon: <HistoryIcon />,
+      path: `/${userInfo?.role}/history`,
+      disabled: userInfo?.role !== roles.moderator.value,
+    },
+    { text: 'Выйти', icon: <LogoutIcon />, path: '/login' },
+  ];
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -98,6 +116,7 @@ const NavPanel = () => {
           <ListButton
             key={item.text}
             onClick={() => handleClick(item.path)}
+            disabled={item.disabled}
             selected={location.pathname === item.path}
           >
             <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>{item.icon}</ListItemIcon>

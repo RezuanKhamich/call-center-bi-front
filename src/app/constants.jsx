@@ -2,14 +2,15 @@ export const roles = {
   minister: { value: 'minister', label: 'Министр' },
   mo: { value: 'mo', label: 'МО' },
   moderator: { value: 'moderator', label: 'Модератор' },
+  'agency-moderator': { value: 'agency-moderator', label: 'Модератор ведомства' },
 };
 
 export const reportsTitle = {
-  callCenter: 'Отчет Колл Центр',
-  secretary: 'Отчет Канцелярии',
-  pos: 'Отчет ПОС',
-  reception: 'Отчет Приемной',
-  press: 'Отчет Пресс Службы',
+  callCenter: { label: 'Колл Центр', value: 'callCenter' },
+  secretary: { label: 'Канцелярия', value: 'secretary' },
+  pos: { label: 'ПОС', value: 'pos' },
+  reception: { label: 'Приемная', value: 'reception' },
+  press: { label: 'Пресс Служба', value: 'press' },
 };
 
 export const reportStatus = {
@@ -153,7 +154,11 @@ export const moListWithAbbr = [
   },
   { abbr: 'СП Тырныауз', value: '«Районная стоматологическая поликлиника»' },
   { abbr: 'Без упоминания МО', value: 'Без упоминания МО' },
-  { abbr: 'ЦОЗМАИТ', value: 'Центр общественного здоровья, медицинской профилактики, медицинской аналитики и информационных технологий' },
+  {
+    abbr: 'ЦОЗМАИТ',
+    value:
+      'Центр общественного здоровья, медицинской профилактики, медицинской аналитики и информационных технологий',
+  },
   { abbr: 'Фармедтех', value: 'Фармедтех' },
 ];
 

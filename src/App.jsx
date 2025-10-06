@@ -69,6 +69,34 @@ function App() {
           />
         </Route>
 
+        {/* Agency-moderator */}
+        <Route element={<AuthRoute allowedRoles={[roles['agency-moderator'].value]} />}>
+          <Route
+            path="/agency-moderator/dashboard"
+            element={
+              <AppLayout>
+                <Dashboard selectedRole={roles['agency-moderator'].value} />
+              </AppLayout>
+            }
+          />
+          {/* <Route
+            path="/agency-moderator/reports"
+            element={
+              <AppLayout>
+                <Reports selectedRole={roles['agency-moderator'].value} />
+              </AppLayout>
+            }
+          />
+          <Route
+            path="/agency-moderator/history"
+            element={
+              <AppLayout>
+                <History selectedRole={roles['agency-moderator'].value} />
+              </AppLayout>
+            }
+          /> */}
+        </Route>
+
         {/* MO */}
         <Route element={<AuthRoute allowedRoles={[roles.mo.value]} />}>
           <Route path="/mo" element={<Dashboard selectedRole={roles.mo.value} />} />

@@ -4,7 +4,12 @@ export async function login(email, password, remember) {
   const res = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email?.trim(), password: password?.trim(), remember, currentTime }),
+    body: JSON.stringify({
+      email: email?.trim(),
+      password: password?.trim(),
+      remember,
+      currentTime,
+    }),
   });
 
   if (!res.ok) {
@@ -22,6 +27,7 @@ export async function login(email, password, remember) {
       role: data.user.role,
       moId: data.user.moId,
       fullName: data.user.fullName,
+      agencyType: data.user.agencyType,
       lastLogin: data.user.lastLogin,
       passwordCreatedAt: data.user.passwordCreatedAt,
     })
