@@ -16,7 +16,7 @@ import biStore from '../app/store/store';
 import dayjs from 'dayjs';
 import { getReq, postReq } from '../app/api/routes';
 import Logo from '../assets/logo.svg';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ModalConfirm from '../features/ModalConfim';
 import LogoImage from '../shared/LogoImage';
 import SubmitButton from '../shared/SubmitButton';
@@ -31,6 +31,7 @@ function getMoReportStats(reports, moName) {
 }
 
 export default function Dashboard({ selectedRole }) {
+  const { id } = useParams();
   const userInfo = biStore((state) => state.userInfo);
   const userRole = userInfo?.role;
   const attachedMoId = userInfo?.moId;
@@ -161,6 +162,15 @@ export default function Dashboard({ selectedRole }) {
   useEffect(() => {
     if (attachedMoId && mos?.length) handleSelectHex(attachedMoId);
   }, [attachedMoId, mos, handleSelectHex]);
+
+  useEffect(() => {
+  if (id && mos?.length) {
+    const mo = mos.find((item) => String(item.id) === String(id));
+    if (mo) {
+      setSelectedMO(mo.name);
+    }
+  }
+}, [id, mos]);
 
   return (
     <BoardContainer role={userRole}>

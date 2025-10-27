@@ -105,6 +105,7 @@ function App() {
         {/* Minister */}
         <Route element={<AuthRoute allowedRoles={[roles.minister.value]} />}>
           <Route path="/minister" element={<Dashboard selectedRole={roles.minister.value} />} />
+          <Route path="/minister/selected-mo/:id" element={<Dashboard selectedRole={roles.minister.value} />} />
         </Route>
       </Routes>
     </BrowserRouter>
