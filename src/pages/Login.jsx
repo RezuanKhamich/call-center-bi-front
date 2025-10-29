@@ -50,6 +50,7 @@ export default function Login() {
         <TextFieldWithError
           onChange={(e) => setPassword(e.target.value)}
           error={errors}
+          type="password"
           label="Пароль"
         />
         {/* <Button
