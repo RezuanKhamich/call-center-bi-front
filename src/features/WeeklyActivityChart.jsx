@@ -106,7 +106,6 @@ export function WeeklyActivityChart({ data = [], period = '7d', moMap = {}, sele
           height={80}
           tickMargin={20}
         />
-        {console.log('data', data)}
         <YAxis allowDecimals={false} tickCount={6} domain={[0, 'dataMax + 1']} />
 
         <Tooltip content={<CustomActivityTooltip moMap={moMap} />} />
