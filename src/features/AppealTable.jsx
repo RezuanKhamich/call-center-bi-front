@@ -2,7 +2,7 @@ import { useEffect, useState, useDeferredValue, useMemo } from 'react';
 import styled from 'styled-components';
 import { customColors } from '../app/theme';
 import { Select, MenuItem } from '@mui/material';
-import { appealStatusList } from '../app/constants';
+import { appealStatusList, reportsTitle } from '../app/constants';
 import { roles } from '../app/constants';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -141,6 +141,7 @@ export default function StyledTable({
               <Th>Суть обращения</Th>
               <Th>Маршрут</Th>
               <Th>МО</Th>
+              <Th>Ведомство</Th>
               <Th>Тип</Th>
               <Th>Тема</Th>
               <Th>Статус</Th>
@@ -175,6 +176,7 @@ export default function StyledTable({
                       row.department
                     )}
                   </Td>
+                  <Td>{row.agency_type && reportsTitle[row.agency_type].label}</Td>
                   <Td>{row.appeal_type}</Td>
                   <Td>{row.subject}</Td>
                   <Td>

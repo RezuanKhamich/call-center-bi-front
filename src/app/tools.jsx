@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import dayjs from 'dayjs';
 import { appealStatusList, appealTypesList, departmentsList, subjectsList } from './constants';
+import biStore from './store/store';
 
 export const parseReportExcel = async (file) => {
   const errors = [];
@@ -85,4 +86,26 @@ export function formatDate(dateStr) {
   const year = date.getFullYear(); // 2025
 
   return `${day}.${month}.${year}`; // "04.07.2025"
+}
+
+export function formatShortName(fullName) {
+  if (!fullName || typeof fullName !== 'string') return 'User';
+
+  const parts = fullName.trim().replace(/\s+/g, ' ').split(' ').filter(Boolean);
+
+  if (parts.length === 0) return '';
+
+  const [surname, name, patronymic] = parts;
+
+  let result = surname;
+
+  if (name?.length) {
+    result += ` ${name[0].toUpperCase()}.`;
+  }
+
+  if (patronymic?.length) {
+    result += ` ${patronymic[0].toUpperCase()}.`;
+  }
+
+  return result;
 }

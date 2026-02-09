@@ -9,19 +9,19 @@ import StyledTable from '../features/AppealTable';
 import LegendItem from '../shared/LegendItem';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { reportsTitle, moListWithAbbr, roles, hexbinChartColours } from '../app/constants';
-import { Button, Chip, Stack, Typography } from '@mui/material';
+import { Chip, Stack, Typography } from '@mui/material';
 import DateRangeFilter from '../shared/DateRangeFilter';
 import { HexbinChart } from '../features/HexbinChart';
 import biStore from '../app/store/store';
 import dayjs from 'dayjs';
 import { getReq, postReq } from '../app/api/routes';
-import Logo from '../assets/logo.svg';
 import { useNavigate, useParams } from 'react-router-dom';
 import ModalConfirm from '../features/ModalConfim';
-import LogoImage from '../shared/LogoImage';
 import SubmitButton from '../shared/SubmitButton';
 import { useToast } from '../app/hooks';
 import { Toast } from '../features/Toast';
+import { NavLink } from 'react-router-dom';
+import Header from '../features/Header';
 
 function getMoReportStats(reports, moName) {
   const filtered = reports.filter((r) => r.department === moName);
@@ -29,6 +29,23 @@ function getMoReportStats(reports, moName) {
   const resolved = filtered.filter((r) => r.status?.toLowerCase() === 'решен').length;
   return { total, resolved };
 }
+
+const isMinister = (role) =>
+  role !== roles.moderator.value && role !== roles['agency-moderator'].value;
+
+const DashboardNav = () => {
+  return (
+    <NavWrapper>
+      <NavItem to="/minister" end>
+        Аналитика
+      </NavItem>
+
+      <NavDivider>|</NavDivider>
+
+      <NavItem to="/minister/visits">Посещаемость</NavItem>
+    </NavWrapper>
+  );
+};
 
 export default function Dashboard({ selectedRole }) {
   const { id } = useParams();
@@ -164,24 +181,23 @@ export default function Dashboard({ selectedRole }) {
   }, [attachedMoId, mos, handleSelectHex]);
 
   useEffect(() => {
-  if (id && mos?.length) {
-    const mo = mos.find((item) => String(item.id) === String(id));
-    if (mo) {
-      setSelectedMO(mo.name);
+    if (id && mos?.length) {
+      const mo = mos.find((item) => String(item.id) === String(id));
+      if (mo) {
+        setSelectedMO(mo.name);
+      }
     }
-  }
-}, [id, mos]);
+  }, [id, mos]);
 
   return (
     <BoardContainer role={userRole}>
-      {userRole !== roles.moderator.value || userRole !== roles['agency-moderator'].value ? (
-        <PageTitleContainer>
-          <LogoImage src={Logo} sx={{ width: 'fit-content' }} text="ЦОЗМАИТ КБР" />
-          <TypographyTitleStyled>Дашборд</TypographyTitleStyled>
-          <LogoutButton variant="outlined" size="small" onClick={() => setShowLogoutModal(true)}>
-            Выйти из аккаунта
-          </LogoutButton>
-        </PageTitleContainer>
+      {isMinister(userRole) ? (
+        <Header
+          pageTitle="Дашборд"
+          userName={userInfo?.fullName || 'Пользователь'}
+          role={userRole}
+          onLogout={() => setShowLogoutModal(true)}
+        />
       ) : (
         <ModeratorHeader>
           <TypographyTitleStyled>Дашборд</TypographyTitleStyled>
@@ -190,13 +206,7 @@ export default function Dashboard({ selectedRole }) {
 
       <StyledContainer>
         <MainLayout>
-          <Sidebar
-            width={
-              userRole !== roles.moderator.value || userRole !== roles['agency-moderator'].value
-                ? '340px'
-                : '400px'
-            }
-          >
+          <Sidebar width={isMinister(userRole) ? '340px' : '400px'}>
             <InfoTitle>Обращений за текущий период: {totalInPeriod}</InfoTitle>
 
             <LegendWrapper>
@@ -320,7 +330,7 @@ const BoardContainer = styled.div`
   flex-direction: column;
   gap: 20px;
   ${(props) =>
-    (props.role !== roles.moderator.value || props.role !== roles['agency-moderator'].value) &&
+    isMinister(props.role) &&
     `
       max-width: 1440px;
       margin: auto;
@@ -328,21 +338,36 @@ const BoardContainer = styled.div`
     `}
 `;
 
-const PageTitleContainer = styled.div`
-  margin-bottom: 20px;
+const NavWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+`;
+
+const NavItem = styled(NavLink)`
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #546e7a;
+  padding-bottom: 2px;
+
+  &.active {
+    color: #1e88e5;
+    border-bottom: 2px solid #1e88e5;
+  }
+
+  &:hover {
+    color: #1565c0;
+  }
+`;
+
+const NavDivider = styled.span`
+  color: #b0bec5;
+  font-size: 14px;
 `;
 
 const TypographyTitleStyled = styled(TypographyTitle)`
   text-align: center;
-`;
-
-const LogoutButton = styled(Button)`
-  && {
-    font-size: 14px;
-  }
 `;
 
 const ModeratorHeader = styled.div`

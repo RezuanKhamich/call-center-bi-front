@@ -12,6 +12,7 @@ import AppLayout from './pages/AppLayout.jsx';
 import { roles } from './app/constants.jsx';
 import biStore from './app/store/store.js';
 import ForgotPassword from './pages/ForgotPassword.jsx';
+import VisitsDashboard from './pages/VisitsDashboard.jsx';
 
 function App() {
   const setUserInfo = biStore((state) => state.setUserInfo);
@@ -105,7 +106,14 @@ function App() {
         {/* Minister */}
         <Route element={<AuthRoute allowedRoles={[roles.minister.value]} />}>
           <Route path="/minister" element={<Dashboard selectedRole={roles.minister.value} />} />
-          <Route path="/minister/selected-mo/:id" element={<Dashboard selectedRole={roles.minister.value} />} />
+          <Route
+            path="/minister/visits"
+            element={<VisitsDashboard selectedRole={roles.minister.value} />}
+          />
+          <Route
+            path="/minister/selected-mo/:id"
+            element={<Dashboard selectedRole={roles.minister.value} />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

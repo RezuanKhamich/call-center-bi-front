@@ -2,7 +2,26 @@ import { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import { subjectsList } from '../app/constants';
 
-const softColorPalette = ['#8dd66b', '#f4dd75', '#f77e7e', '#79d8df', '#c2a9fa', '#ffb997'];
+const softColorPalette = [
+  '#7BC96F', // fresh green
+  '#6ECAD3', // bright turquoise
+  '#6FA8FF', // clear blue
+  '#8B7CFF', // vivid violet
+  '#C77DFF', // rich lavender
+  '#FF7EB6', // vibrant pink
+  '#FF6B6B', // strong coral red
+  '#FF9F68', // warm orange
+  '#FFD166', // golden yellow
+
+  '#4DD599', // teal green
+  '#3FC1C9', // cyan blue
+  '#5B7FFF', // royal blue
+  '#9D4EDD', // deep purple
+  '#E07A5F', // terracotta
+  '#F2CC8F', // sand yellow
+  '#A8DADC', // pale cyan
+  '#B5838D', // dusty mauve
+];
 
 const sampleData = [
   { label: 'Лекарственное обеспечение', value: 65 },
@@ -47,7 +66,7 @@ export default function PieChart({ reportsList = sampleData }) {
 
     const svg = d3
       .select(ref.current)
-      .attr('viewBox', `0 0 ${width + 200} ${height}`)
+      .attr('viewBox', `0 0 ${width + 240} ${height}`)
       .append('g')
       .attr('transform', `translate(${width / 2}, ${height / 2})`);
 
@@ -103,15 +122,19 @@ export default function PieChart({ reportsList = sampleData }) {
     const legend = d3
       .select(ref.current)
       .append('g')
-      .attr('transform', `translate(${width + 10}, 20)`);
+      .attr('transform', `translate(${width + 10}, 0)`);
 
-    // const legendItem = legend
-    //   .selectAll('g')
-    //   .data(data)
-    //   .enter()
-    //   .append('g')
-    //   .attr('transform', (_, i) => `translate(0, ${i * 25})`);
     let offsetY = 0;
+
+    const paths = svg
+      .selectAll('path')
+      .data(data_ready)
+      .join('path')
+      .attr('class', 'pie-slice')
+      .attr('d', arc)
+      .attr('fill', (d) => color(d.data.label))
+      .attr('stroke', 'white')
+      .style('stroke-width', '2px');
 
     const legendLines = data.map((d) => {
       const words = d.label.split(' ');
@@ -126,13 +149,19 @@ export default function PieChart({ reportsList = sampleData }) {
           currentLine = word;
         }
       });
+
       if (currentLine) lines.push(currentLine.trim());
+
+      // добавляем количество в последнюю строку
+      lines[lines.length - 1] = `${lines[lines.length - 1]} (${d.value})`;
+
       return { ...d, lines };
     });
 
     const legendItem = legend
       .selectAll('g')
       .data(legendLines)
+      .style('cursor', 'pointer')
       .enter()
       .append('g')
       .attr('transform', (d, i) => {
@@ -147,10 +176,6 @@ export default function PieChart({ reportsList = sampleData }) {
       .attr('height', 18)
       .attr('fill', (d) => color(d.label));
 
-    // Шаг 1: разбиваем строки заранее и сохраняем их в объект с количеством строк
-
-    // Шаг 2: аккумулируем вертикальное смещение
-
     // Прямоугольник
     legendItem
       .append('rect')
@@ -163,6 +188,7 @@ export default function PieChart({ reportsList = sampleData }) {
       .append('text')
       .attr('x', 24)
       .attr('y', 14)
+      .style('cursor', 'pointer')
       .style('font-size', '14px')
       .each(function (d) {
         const text = d3.select(this);
@@ -174,7 +200,31 @@ export default function PieChart({ reportsList = sampleData }) {
             .text(line);
         });
       });
+
+    legendItem
+      .on('mouseenter', function (_, d) {
+        paths
+          .filter((p) => p.data.label === d.label)
+          .transition()
+          .duration(300)
+          .attr(
+            'd',
+            d3
+              .arc()
+              .innerRadius(0)
+              .outerRadius(radius + 10) // увеличение
+          )
+          .style('filter', 'brightness(1.1)');
+      })
+      .on('mouseleave', function (_, d) {
+        paths
+          .filter((p) => p.data.label === d.label)
+          .transition()
+          .duration(300)
+          .attr('d', arc)
+          .style('filter', 'brightness(1)');
+      });
   }, [data]);
 
-  return <svg ref={ref} style={{ width: '30%', flex: 0.5, height: 'auto' }} />;
+  return <svg ref={ref} style={{ width: '30%', flex: 0.5, height: 'auto', padding: '20px' }} />;
 }

@@ -137,5 +137,5 @@ export default function BarChart({ reportsList = sampleData }) {
     });
   }, [data]);
 
-  return <svg ref={ref} style={{ width: '50%', flex: 1, height: 'auto' }} />;
+  return <svg ref={ref} style={{ width: '50%', flex: 1, height: 'auto', padding: '20px' }} />;
 }
