@@ -33,6 +33,8 @@ function buildChartData(rawData, period, selectedMoId) {
 
   if (period === '90d') {
     normalizedData = aggregateByWeek(normalizedData);
+  } else {
+    normalizedData = aggregateByDay(normalizedData);
   }
 
   const dataMap = new Map(normalizedData.map((d) => [dayjs(d.date).format('YYYY-MM-DD'), d]));
@@ -56,6 +58,28 @@ function buildChartData(rawData, period, selectedMoId) {
   }
 
   return result;
+}
+
+function aggregateByDay(data) {
+  const map = new Map();
+
+  data.forEach((item) => {
+    const dayKey = dayjs(item.date).startOf('day').format('YYYY-MM-DD');
+
+    if (!map.has(dayKey)) {
+      map.set(dayKey, {
+        date: dayKey,
+        visits: 0,
+        users: [],
+      });
+    }
+
+    const entry = map.get(dayKey);
+    entry.visits += item.visits || 0;
+    entry.users.push(...(item.users || []));
+  });
+
+  return Array.from(map.values());
 }
 
 function aggregateByWeek(data) {
@@ -108,7 +132,7 @@ export function WeeklyActivityChart({ data = [], period = '7d', moMap = {}, sele
         />
         <YAxis allowDecimals={false} tickCount={6} domain={[0, 'dataMax + 1']} />
 
-        <Tooltip content={<CustomActivityTooltip moMap={moMap} />} />
+        <Tooltip content={<CustomActivityTooltip moMap={moMap} period={period} />} />
 
         <Bar dataKey="visits" fill="#1e88e5" radius={[6, 6, 0, 0]} minPointSize={2} />
       </BarChart>

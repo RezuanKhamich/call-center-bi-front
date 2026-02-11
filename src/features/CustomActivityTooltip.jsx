@@ -2,14 +2,24 @@ import dayjs from 'dayjs';
 import { styled } from 'styled-components';
 import { moListWithAbbr } from '../app/constants';
 
-export function CustomActivityTooltip({ active, payload }) {
+export function CustomActivityTooltip({ active, payload, period }) {
   if (!active || !payload?.length) return null;
 
   const { date, users = [] } = payload[0].payload;
 
+  let dateLabel;
   const moStats = new Map();
 
   const moAbbrMap = new Map(moListWithAbbr.map((m) => [m.id, m.abbr]));
+
+  if (period === '90d') {
+    const start = dayjs(date).startOf('week');
+    const end = dayjs(date).endOf('week');
+
+    dateLabel = `${start.format('DD.MM')} - ${end.format('DD.MM')}`;
+  } else {
+    dateLabel = dayjs(date).format('DD.MM.YYYY');
+  }
 
   users.forEach((u) => {
     const moId = u.mo_id ?? 0;
@@ -42,7 +52,7 @@ export function CustomActivityTooltip({ active, payload }) {
 
   return (
     <TooltipBox>
-      <DateTitle>{dayjs(date).format('DD.MM.YYYY')}</DateTitle>
+      <DateTitle>{dateLabel}</DateTitle>
 
       <Total>
         Всего посещений: <b>{totalVisits}</b>
