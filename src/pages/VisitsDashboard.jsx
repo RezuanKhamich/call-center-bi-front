@@ -53,12 +53,14 @@ export default function VisitsDashboard({ selectedRole }) {
   const navigate = useNavigate();
   const userInfo = biStore((s) => s.userInfo);
   const moListFromStore = biStore((s) => s.moList);
+  const cozName =
+    'Центр общественного здоровья, медицинской профилактики, медицинской аналитики и информационных технологий';
 
   const moListFromApi = useMoList(selectedRole);
 
   const moList = useMemo(() => {
-    if (moListFromStore?.length) return moListFromStore;
-    if (moListFromApi?.length) return moListFromApi;
+    if (moListFromStore?.length) return moListFromStore?.filter((mo) => mo?.name !== cozName);
+    if (moListFromApi?.length) return moListFromApi?.filter((mo) => mo?.name !== cozName);
     return [];
   }, [moListFromStore, moListFromApi]);
 
