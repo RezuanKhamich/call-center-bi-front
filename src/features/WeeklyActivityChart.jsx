@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 
 function buildChartData(rawData, period, selectedMoId) {
   const daysMap = {
+    '1d': 1,
     '7d': 7,
     '30d': 30,
     '90d': 90,
@@ -18,6 +19,10 @@ function buildChartData(rawData, period, selectedMoId) {
     .subtract(days - 1, 'day')
     .startOf('day');
   const end = dayjs().startOf('day');
+
+  if (period === 'day') {
+    return buildHourlyData(rawData, selectedMoId);
+  }
 
   let normalizedData = rawData.map((d) => {
     const filteredUsers = selectedMoId ? d.users.filter((u) => u.mo_id === selectedMoId) : d.users;
@@ -55,6 +60,42 @@ function buildChartData(rawData, period, selectedMoId) {
     });
 
     cursor = cursor.add(1, period === '90d' ? 'week' : 'day');
+  }
+
+  return result;
+}
+
+function buildHourlyData(rawData, selectedMoId) {
+  const map = new Map();
+
+  rawData.forEach((item) => {
+    const hour = item.date; // "14:00"
+
+    const filteredUsers = selectedMoId
+      ? item.users.filter((u) => u.mo_id === selectedMoId)
+      : item.users;
+
+    const visits = filteredUsers.reduce((sum, u) => sum + (u.visits || 0), 0);
+
+    map.set(hour, {
+      date: hour,
+      visits,
+      users: filteredUsers,
+    });
+  });
+
+  const result = [];
+
+  for (let i = 0; i < 24; i++) {
+    const hourKey = `${i.toString().padStart(2, '0')}:00`;
+
+    result.push(
+      map.get(hourKey) || {
+        date: hourKey,
+        visits: 0,
+        users: [],
+      }
+    );
   }
 
   return result;
@@ -122,9 +163,7 @@ export function WeeklyActivityChart({ data = [], period = '7d', moMap = {}, sele
         <XAxis
           dataKey="date"
           interval={0}
-          tickFormatter={(v) =>
-            period === '90d' ? dayjs(v).format('DD.MM') : dayjs(v).format('DD.MM')
-          }
+          tickFormatter={(v) => (period === 'day' ? v : dayjs(v).format('DD.MM'))}
           angle={-45}
           textAnchor="end"
           height={80}

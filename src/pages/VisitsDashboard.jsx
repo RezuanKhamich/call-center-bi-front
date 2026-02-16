@@ -42,6 +42,7 @@ function formatLastActivity(lastActivity) {
 }
 
 const ACTIVITY_ENDPOINT_BY_PERIOD = {
+  day: 'activity/summary/day',
   '7d': 'activity/summary/week',
   '30d': 'activity/summary/month',
   '90d': 'activity/summary/90days',
@@ -74,6 +75,7 @@ export default function VisitsDashboard({ selectedRole }) {
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState('7d');
   const [selectedMoId, setSelectedMoId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState({ key: 'full_name', direction: 'asc' });
@@ -87,18 +89,27 @@ export default function VisitsDashboard({ selectedRole }) {
     async function loadActivity() {
       setLoading(true);
       try {
-        const res = await getReq(`${selectedRole}/${ACTIVITY_ENDPOINT_BY_PERIOD[period]}`);
+        let url = `${selectedRole}/${ACTIVITY_ENDPOINT_BY_PERIOD[period]}`;
+
+        if (period === 'day' && selectedDate) {
+          url += `?date=${selectedDate}`;
+        }
+
+        const res = await getReq(url);
         if (!cancelled) setActivity(res);
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    loadActivity();
+    if (period !== 'day' || selectedDate) {
+      loadActivity();
+    }
+
     return () => {
       cancelled = true;
     };
-  }, [selectedRole, period]);
+  }, [selectedRole, period, selectedDate]);
 
   /* -------- build users table -------- */
 
@@ -136,10 +147,11 @@ export default function VisitsDashboard({ selectedRole }) {
 
   const filteredUsers = useMemo(() => {
     const q = search.toLowerCase();
-    return users.filter(
-      (u) => u.full_name.toLowerCase().includes(q) || u.mo_name.toLowerCase().includes(q)
-    );
-  }, [users, search]);
+
+    return users
+      .filter((u) => (selectedMoId ? u.mo_id === selectedMoId : true))
+      .filter((u) => u.full_name.toLowerCase().includes(q) || u.mo_name.toLowerCase().includes(q));
+  }, [users, search, selectedMoId]);
 
   const sortedUsers = useMemo(() => {
     const arr = [...filteredUsers];
@@ -180,10 +192,34 @@ export default function VisitsDashboard({ selectedRole }) {
         {/* Chart */}
         <StyledContainer title="График посещаемости" sx={{ flexDirection: 'column' }}>
           <ChartHeader>
-            <Typography variant="h6">Фильтр</Typography>
+            <Typography variant="h6">Фильтры</Typography>
 
             <Filters>
-              <Select size="small" value={period} onChange={(e) => setPeriod(e.target.value)}>
+              {period === 'day' && (
+                <TextField
+                  type="date"
+                  size="small"
+                  value={selectedDate || ''}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                />
+              )}
+
+              <Select
+                size="small"
+                value={period}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPeriod(value);
+
+                  if (value === 'day') {
+                    const today = dayjs().format('YYYY-MM-DD');
+                    setSelectedDate(today);
+                  } else {
+                    setSelectedDate(null);
+                  }
+                }}
+              >
+                <MenuItem value="day">День</MenuItem>
                 <MenuItem value="7d">7 дней</MenuItem>
                 <MenuItem value="30d">30 дней</MenuItem>
                 <MenuItem value="90d">90 дней</MenuItem>

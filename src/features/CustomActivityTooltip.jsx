@@ -17,6 +17,14 @@ export function CustomActivityTooltip({ active, payload, period }) {
     const end = dayjs(date).endOf('week');
 
     dateLabel = `${start.format('DD.MM')} - ${end.format('DD.MM')}`;
+  } else if (period === 'day') {
+    // Если приходит уже строка "14:00"
+    if (typeof date === 'string' && date.includes(':')) {
+      dateLabel = date;
+    } else {
+      // Если приходит timestamp
+      dateLabel = dayjs(date).format('HH:mm');
+    }
   } else {
     dateLabel = dayjs(date).format('DD.MM.YYYY');
   }
