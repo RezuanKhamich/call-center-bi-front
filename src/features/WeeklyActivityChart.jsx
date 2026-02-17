@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { CustomActivityTooltip } from './CustomActivityTooltip';
 import { useMemo } from 'react';
+import utc from 'dayjs/plugin/utc';
 
 /* ---------------- helpers ---------------- */
 
@@ -65,25 +66,51 @@ function buildChartData(rawData, period, selectedMoId) {
   return result;
 }
 
+dayjs.extend(utc);
+
 function buildHourlyData(rawData, selectedMoId) {
   const map = new Map();
 
   rawData.forEach((item) => {
-    const hour = item.date; // "14:00"
+    let localHour;
 
+    // ---- 1. Если сервер вернул строку вида "14:00" (UTC) ----
+    if (typeof item.date === 'string' && item.date.includes(':')) {
+      const [hourStr] = item.date.split(':');
+      const utcHour = Number(hourStr);
+
+      // создаём дату в UTC
+      const utcDate = dayjs.utc().hour(utcHour).minute(0).second(0);
+
+      // переводим в локальную зону браузера
+      localHour = utcDate.local().format('HH:00');
+    } else {
+      // ---- 2. Если пришёл ISO timestamp ----
+      localHour = dayjs(item.date).local().format('HH:00');
+    }
+
+    // ---- 3. Фильтрация по МО ----
     const filteredUsers = selectedMoId
       ? item.users.filter((u) => u.mo_id === selectedMoId)
       : item.users;
 
     const visits = filteredUsers.reduce((sum, u) => sum + (u.visits || 0), 0);
 
-    map.set(hour, {
-      date: hour,
-      visits,
-      users: filteredUsers,
-    });
+    // ---- 4. Если час уже есть — суммируем ----
+    if (map.has(localHour)) {
+      const existing = map.get(localHour);
+      existing.visits += visits;
+      existing.users.push(...filteredUsers);
+    } else {
+      map.set(localHour, {
+        date: localHour,
+        visits,
+        users: [...filteredUsers],
+      });
+    }
   });
 
+  // ---- 5. Заполняем отсутствующие часы ----
   const result = [];
 
   for (let i = 0; i < 24; i++) {

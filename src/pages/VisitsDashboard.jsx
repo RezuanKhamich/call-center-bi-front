@@ -5,6 +5,7 @@ import { TextField, Typography, InputAdornment, IconButton, MenuItem, Select } f
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import StyledContainer from '../shared/StyledContainer';
 import Header from '../features/Header';
@@ -76,12 +77,34 @@ export default function VisitsDashboard({ selectedRole }) {
   const [period, setPeriod] = useState('7d');
   const [selectedMoId, setSelectedMoId] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [moUsers, setMoUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState({ key: 'full_name', direction: 'asc' });
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   /* -------- load activity -------- */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadUsers() {
+      setUsersLoading(true);
+      try {
+        const res = await getReq('minister/mo-users');
+        if (!cancelled) setMoUsers(res);
+      } finally {
+        if (!cancelled) setUsersLoading(false);
+      }
+    }
+
+    loadUsers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -111,47 +134,18 @@ export default function VisitsDashboard({ selectedRole }) {
     };
   }, [selectedRole, period, selectedDate]);
 
-  /* -------- build users table -------- */
-
-  const users = useMemo(() => {
-    if (!activity?.length) return [];
-
-    const map = new Map();
-
-    activity.forEach((day) => {
-      day.users.forEach((u) => {
-        if (!map.has(u.user_id)) {
-          map.set(u.user_id, {
-            id: u.user_id,
-            full_name: u.full_name,
-            mo_id: u.mo_id,
-            mo_name: moMap.get(u.mo_id) || '—',
-            visits: 0,
-            last_activity: u.last_activity,
-          });
-        }
-
-        const user = map.get(u.user_id);
-        user.visits += u.visits;
-
-        if (!user.last_activity || dayjs(u.last_activity).isAfter(user.last_activity)) {
-          user.last_activity = u.last_activity;
-        }
-      });
-    });
-
-    return Array.from(map.values());
-  }, [activity, moMap]);
-
   /* -------- filtering & sorting -------- */
 
   const filteredUsers = useMemo(() => {
-    const q = search.toLowerCase();
+    const q = search.trim().toLowerCase();
 
-    return users
-      .filter((u) => (selectedMoId ? u.mo_id === selectedMoId : true))
-      .filter((u) => u.full_name.toLowerCase().includes(q) || u.mo_name.toLowerCase().includes(q));
-  }, [users, search, selectedMoId]);
+    return moUsers.filter((u) => {
+      const fullName = u.full_name?.toLowerCase() || '';
+      const moName = u.med_organization?.name?.toLowerCase() || '';
+
+      return !q || fullName.includes(q) || moName.includes(q);
+    });
+  }, [moUsers, search]);
 
   const sortedUsers = useMemo(() => {
     const arr = [...filteredUsers];
@@ -165,6 +159,7 @@ export default function VisitsDashboard({ selectedRole }) {
 
       const aVal = a[sort.key] || '';
       const bVal = b[sort.key] || '';
+
       return sort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
     });
 
@@ -288,22 +283,38 @@ export default function VisitsDashboard({ selectedRole }) {
               </tr>
             </thead>
             <tbody>
-              {sortedUsers.map((u, index) => (
-                <Tr key={u.id}>
-                  <Td>{index + 1}</Td>
-                  <Td>{u.full_name}</Td>
-                  <Td>{u.mo_name}</Td>
-                  <Td bold>
-                    {u.last_activity ? dayjs(u.last_activity).format('HH:mm | DD.MM.YYYY') : '—'}
-                  </Td>
-                  <Td>
-                    <StatusWrapper>
-                      <StatusDot status={getActivityStatus(u.last_activity)} />
-                      <StatusText>{formatLastActivity(u.last_activity)}</StatusText>
-                    </StatusWrapper>
-                  </Td>
-                </Tr>
-              ))}
+              {usersLoading ? (
+                <tr>
+                  <td colSpan={5}>
+                    <TableLoader>
+                      <CircularProgress size={28} />
+                    </TableLoader>
+                  </td>
+                </tr>
+              ) : sortedUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={5}>
+                    <EmptyState>Нет данных</EmptyState>
+                  </td>
+                </tr>
+              ) : (
+                sortedUsers.map((u, index) => (
+                  <Tr key={u.id}>
+                    <Td>{index + 1}</Td>
+                    <Td>{u.full_name}</Td>
+                    <Td>{u.med_organization?.name}</Td>
+                    <Td bold>
+                      {u.last_activity ? dayjs(u.last_activity).format('HH:mm | DD.MM.YYYY') : '—'}
+                    </Td>
+                    <Td>
+                      <StatusWrapper>
+                        <StatusDot status={getActivityStatus(u.last_activity)} />
+                        <StatusText>{formatLastActivity(u.last_activity)}</StatusText>
+                      </StatusWrapper>
+                    </Td>
+                  </Tr>
+                ))
+              )}
             </tbody>
           </Table>
         </StyledContainer>
@@ -405,4 +416,18 @@ const StatusDot = styled.div`
   border-radius: 50%;
   background-color: ${({ status }) =>
     status === 'active' ? '#43a047' : status === 'warning' ? '#fbc02d' : '#e53935'};
+`;
+
+const TableLoader = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 40px 0;
+  color: #78909c;
+  font-size: 14px;
 `;
