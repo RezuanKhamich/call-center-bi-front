@@ -151,8 +151,9 @@ export default function Dashboard({ selectedRole }) {
   const onApplyFiltersHandler = useCallback(async () => {
     try {
       const params = new URLSearchParams();
-      if (startDate) params.append('reporting_period_start_date', dayjs(startDate).toISOString());
-      if (endDate) params.append('reporting_period_end_date', dayjs(endDate).toISOString());
+      if (startDate)
+        params.append('reporting_period_start_date', dayjs(startDate).format('YYYY-MM-DD'));
+      if (endDate) params.append('reporting_period_end_date', dayjs(endDate).format('YYYY-MM-DD'));
       if (attachedMoId) params.append('mo_id', attachedMoId);
 
       const res = await getReq(`${selectedRole}/reports-by-date?${params.toString()}`);
