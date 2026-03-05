@@ -18,11 +18,13 @@ import { useMoList } from '../app/hooks';
 /* ---------------- helpers ---------------- */
 
 function getActivityStatus(lastActivity) {
-  if (!lastActivity) return 'inactive';
+  if (!lastActivity) return 'no_activity';
 
   const minutes = dayjs().diff(dayjs(lastActivity), 'minute');
+
   if (minutes < 24 * 60) return 'active';
   if (minutes < 48 * 60) return 'warning';
+
   return 'inactive';
 }
 
@@ -414,8 +416,17 @@ const StatusDot = styled.div`
   width: 12px;
   height: 12px;
   border-radius: 50%;
+
   background-color: ${({ status }) =>
-    status === 'active' ? '#43a047' : status === 'warning' ? '#fbc02d' : '#e53935'};
+    status === 'active'
+      ? '#43a047'
+      : status === 'warning'
+        ? '#fbc02d'
+        : status === 'inactive'
+          ? '#e53935'
+          : status === 'no_activity'
+            ? '#000000'
+            : '#9e9e9e'};
 `;
 
 const TableLoader = styled.div`
