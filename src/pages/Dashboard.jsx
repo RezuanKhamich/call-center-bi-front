@@ -13,7 +13,7 @@ import {
   moListWithAbbr,
   roles,
   hexbinChartColours,
-  appealTypesList,
+  subjectsList,
 } from '../app/constants';
 import { Chip, Stack, Typography } from '@mui/material';
 import DateRangeFilter from '../shared/DateRangeFilter';
@@ -78,10 +78,10 @@ export default function Dashboard({ selectedRole }) {
     []
   );
 
-  const appealTypeList = useMemo(
+  const subjectTypeList = useMemo(
     () => [
-      { value: null, label: 'Все типы' },
-      ...appealTypesList.map((type) => ({ value: type, label: type })),
+      { value: null, label: 'Все темы' },
+      ...subjectsList.map((type) => ({ value: type, label: type })),
     ],
     []
   );
@@ -91,7 +91,7 @@ export default function Dashboard({ selectedRole }) {
   const [updatedReports, setUpdatedReports] = useState([]);
   const { addToast, toasts } = useToast();
   const [agencyType, setAgencyType] = useState({});
-  const [appealType, setAppealType] = useState(appealTypeList[0]);
+  const [subjectType, setSubjectType] = useState(subjectTypeList[0]);
   const [selectedMO, setSelectedMO] = useState(null);
 
   const onChangeStartDate = useCallback((date) => setStartDate(date), []);
@@ -109,10 +109,10 @@ export default function Dashboard({ selectedRole }) {
   const baseFilteredReports = useMemo(() => {
     return listRaw.filter((report) => {
       const matchAgency = agencyType?.value ? report.agency_type === agencyType.value : true;
-      const matchAppealType = appealType?.value ? report.appeal_type === appealType.value : true;
+      const matchAppealType = subjectType?.value ? report.subject === subjectType.value : true;
       return matchAgency && matchAppealType;
     });
-  }, [listRaw, agencyType?.value, appealType?.value]);
+  }, [listRaw, agencyType?.value, subjectType?.value]);
 
   const viewFilteredReports = useMemo(() => {
     const mergedReports = baseFilteredReports.map((report) => {
@@ -251,10 +251,10 @@ export default function Dashboard({ selectedRole }) {
                     variant="outlined"
                   />
                 )}
-                {appealType?.value && (
+                {subjectType?.value && (
                   <Chip
-                    label={appealType?.label}
-                    onDelete={() => setAppealType(appealTypeList[0])}
+                    label={subjectType?.label}
+                    onDelete={() => setSubjectType(subjectType[0])}
                     color="primary"
                     variant="outlined"
                   />
@@ -278,9 +278,9 @@ export default function Dashboard({ selectedRole }) {
               )}
 
               <FilterSelected
-                value={appealType?.label}
-                onChange={setAppealType}
-                list={appealTypeList}
+                value={subjectType?.label}
+                onChange={setSubjectType}
+                list={subjectTypeList}
               />
 
               <SubmitButton onClickHandler={onApplyFiltersHandler} label="Применить" />
