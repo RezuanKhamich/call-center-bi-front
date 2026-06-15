@@ -8,7 +8,13 @@ import BarChart from '../features/BarChart';
 import StyledTable from '../features/AppealTable';
 import LegendItem from '../shared/LegendItem';
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { reportsTitle, moListWithAbbr, roles, hexbinChartColours } from '../app/constants';
+import {
+  reportsTitle,
+  moListWithAbbr,
+  roles,
+  hexbinChartColours,
+  appealTypesList,
+} from '../app/constants';
 import { Chip, Stack, Typography } from '@mui/material';
 import DateRangeFilter from '../shared/DateRangeFilter';
 import { HexbinChart } from '../features/HexbinChart';
@@ -71,12 +77,21 @@ export default function Dashboard({ selectedRole }) {
     () => [{ value: null, label: 'Все ведомства' }, ...Object.values(reportsTitle)],
     []
   );
+
+  const appealTypeList = useMemo(
+    () => [
+      { value: null, label: 'Все типы' },
+      ...appealTypesList.map((type) => ({ value: type, label: type })),
+    ],
+    []
+  );
   const [startDate, setStartDate] = useState(dayjs().subtract(1, 'month').startOf('day'));
   const [endDate, setEndDate] = useState(dayjs().endOf('day'));
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [updatedReports, setUpdatedReports] = useState([]);
   const { addToast, toasts } = useToast();
   const [agencyType, setAgencyType] = useState({});
+  const [appealType, setAppealType] = useState(appealTypeList[0]);
   const [selectedMO, setSelectedMO] = useState(null);
 
   const onChangeStartDate = useCallback((date) => setStartDate(date), []);
@@ -94,9 +109,10 @@ export default function Dashboard({ selectedRole }) {
   const baseFilteredReports = useMemo(() => {
     return listRaw.filter((report) => {
       const matchAgency = agencyType?.value ? report.agency_type === agencyType.value : true;
-      return matchAgency;
+      const matchAppealType = appealType?.value ? report.appeal_type === appealType.value : true;
+      return matchAgency && matchAppealType;
     });
-  }, [listRaw, agencyType?.value]);
+  }, [listRaw, agencyType?.value, appealType?.value]);
 
   const viewFilteredReports = useMemo(() => {
     const mergedReports = baseFilteredReports.map((report) => {
@@ -235,6 +251,14 @@ export default function Dashboard({ selectedRole }) {
                     variant="outlined"
                   />
                 )}
+                {appealType?.value && (
+                  <Chip
+                    label={appealType?.label}
+                    onDelete={() => setAppealType(appealTypeList[0])}
+                    color="primary"
+                    variant="outlined"
+                  />
+                )}
               </ChipWrapper>
             )}
 
@@ -252,6 +276,12 @@ export default function Dashboard({ selectedRole }) {
                   list={agencyTypeList}
                 />
               )}
+
+              <FilterSelected
+                value={appealType?.label}
+                onChange={setAppealType}
+                list={appealTypeList}
+              />
 
               <SubmitButton onClickHandler={onApplyFiltersHandler} label="Применить" />
             </FilterStack>
