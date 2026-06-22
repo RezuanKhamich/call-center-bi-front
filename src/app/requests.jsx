@@ -1,4 +1,4 @@
-export async function removeReportByDate(date) {
+export async function removeReportByDate(createdAt) {
   const token = localStorage.getItem('token');
 
   const res = await fetch(`${import.meta.env.VITE_API_URL}/moderator/delete-reports-by-date`, {
@@ -7,7 +7,7 @@ export async function removeReportByDate(date) {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ date }),
+    body: JSON.stringify({ createdAt }),
   });
 
   if (!res.ok) {

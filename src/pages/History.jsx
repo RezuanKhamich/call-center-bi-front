@@ -29,16 +29,12 @@ export default function History({ selectedRole }) {
 
   const onDeleteReport = async () => {
     try {
-      const res = await removeReportByDate(
-        reportByDate[reportIdForDelete].reporting_period_start_date
-      );
+      const res = await removeReportByDate(reportByDate[reportIdForDelete].createdAt);
       if (res.message) {
         addToast(res.message, 'success');
         setReportByDate((prev) =>
           prev.filter(
-            (el) =>
-              el.reporting_period_start_date !==
-              reportByDate[reportIdForDelete].reporting_period_start_date
+            (el) => el.createdAt !== reportByDate[reportIdForDelete].createdAt
           )
         );
       }
@@ -79,6 +75,7 @@ export default function History({ selectedRole }) {
                 status={report.status}
                 startDate={formatDate(report.reporting_period_start_date)}
                 endDate={formatDate(report.reporting_period_end_date)}
+                agencies={report.agencies}
                 error={report.error}
                 showDeleteModal={() => setReportIdForDelete(index)}
                 onEditHandler={onEditReport}

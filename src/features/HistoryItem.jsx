@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Tag from '../shared/Tag';
 import SubmitButton from '../shared/SubmitButton';
 import { customColors } from '../app/theme';
+import { reportsTitle } from '../app/constants';
 
 const ActionContainer = styled.div`
   display: flex;
@@ -26,6 +27,7 @@ const HistoryItem = ({
   startDate,
   createdAt,
   endDate,
+  agencies,
   showDeleteModal,
   onEditHandler,
 }) => {
@@ -37,8 +39,15 @@ const HistoryItem = ({
             <Tag text={userName} />
             <Tag
               color={customColors.primary.mainHover}
-              text={new Date(createdAt).toLocaleDateString('ru-RU')}
+              text={`${new Date(createdAt).toLocaleDateString('ru-RU')} ${new Date(createdAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`}
             />
+            {agencies?.map((agency) => (
+              <Tag
+                key={agency}
+                color={customColors.cards.productsGreen}
+                text={reportsTitle[agency]?.label || agency}
+              />
+            ))}
           </TagWrapper>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography>
