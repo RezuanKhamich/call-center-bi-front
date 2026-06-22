@@ -103,9 +103,11 @@ export default function Reports({ selectedRole }) {
   const onChangeReports = (rowId, key, data) => {
     setReports((prev) => {
       const updated = prev.map((el) => (el.id === rowId ? { ...el, [key]: data } : el));
+      const hasErrors = updated.some((el) => el.status === reportStatus.error);
+      const hasSuccess = updated.some((el) => el.status === reportStatus.success);
+      const canPublish = !hasErrors && hasSuccess;
 
-      const allValid = updated.every((el) => el.status === reportStatus.success);
-      setIsPublishBtnDisabled(!allValid);
+      setIsPublishBtnDisabled(!canPublish);
 
       return updated;
     });
